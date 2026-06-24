@@ -210,19 +210,29 @@ export function initTimeline() {
     raf = requestAnimationFrame(tick);
   }
 
-  // Scrollama wiring.
+  // The static (pinned) text panel: one card shown at a time.
+  const panel = document.getElementById("timeline-panel");
+  const panelCards = panel ? Array.from(panel.querySelectorAll(".panel-card")) : [];
+
+  function showPanel(idx) {
+    panelCards.forEach((card) => {
+      card.classList.toggle("is-active", Number(card.dataset.step) === idx);
+    });
+  }
+  showPanel(0);
+
+  // Scrollama wiring. The big visualization column scrolls; invisible
+  // `.trigger` blocks inside it advance the animation and the pinned text.
   const scroller = scrollama();
   scroller
     .setup({
-      step: "#timeline-steps .step",
+      step: "#timeline-steps .trigger",
       offset: 0.6,
     })
     .onStepEnter((response) => {
-      const stepEls = stepsRoot.querySelectorAll(".step");
-      stepEls.forEach((el) => el.classList.remove("is-active"));
-      response.element.classList.add("is-active");
       const idx = Number(response.element.dataset.step);
       setState(idx);
+      showPanel(idx);
     });
 
   window.addEventListener("resize", () => {

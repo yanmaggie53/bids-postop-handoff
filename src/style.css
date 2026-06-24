@@ -348,17 +348,20 @@ strong {
 }
 
 /* ---------- SCROLLY (timeline) ---------- */
+/* The visualization is the large scrolling column; the text aside is pinned. */
 .scrolly {
   position: relative;
   display: flex;
-  gap: 2rem;
-  max-width: 1100px;
+  gap: 2.5rem;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 0 1.5rem;
+  align-items: flex-start;
 }
 
+/* Big visualization column: holds the sticky SVG + invisible scroll triggers. */
 .scrolly__graphic {
-  flex: 1 1 55%;
+  flex: 1 1 70%;
   position: relative;
 }
 
@@ -369,60 +372,78 @@ strong {
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 1;
 }
 
 .scrolly__sticky svg {
   width: 100%;
-  height: 92%;
+  height: 96%;
   overflow: visible;
 }
 
-.scrolly__steps {
-  flex: 1 1 45%;
+/* Invisible blocks that drive Scrollama. They overlay the sticky graphic and
+   give the column its scroll height. */
+.scrolly__triggers {
   position: relative;
-  z-index: 2;
+  margin-top: -100svh;
+  z-index: 0;
+  pointer-events: none;
 }
 
-.step {
-  min-height: 90svh;
+.trigger {
+  height: 95svh;
+}
+
+.trigger:first-child {
+  height: 70svh;
+}
+
+.trigger:last-child {
+  height: 110svh;
+}
+
+/* Narrow pinned text column. */
+.scrolly__aside {
+  flex: 0 0 26%;
+  position: relative;
+}
+
+.scrolly__panel {
+  position: sticky;
+  top: 0;
+  height: 100svh;
   display: flex;
   align-items: center;
 }
 
-.step:first-child {
-  min-height: 70svh;
-}
-
-.step:last-child {
-  min-height: 100svh;
-}
-
-.step__card {
-  background: rgba(250, 247, 242, 0.92);
-  backdrop-filter: blur(2px);
+.panel-card {
+  position: absolute;
+  background: rgba(250, 247, 242, 0.94);
   border: 1px solid var(--line);
   border-radius: 12px;
-  padding: 1.75rem 2rem;
+  padding: 1.25rem 1.4rem;
   box-shadow: 0 10px 30px rgba(31, 58, 95, 0.1);
-  opacity: 0.35;
-  transform: translateY(12px);
-  transition: opacity 0.4s ease, transform 0.4s ease;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.45s ease, transform 0.45s ease;
+  pointer-events: none;
 }
 
-.step.is-active .step__card {
+.panel-card.is-active {
   opacity: 1;
   transform: translateY(0);
+  pointer-events: auto;
 }
 
-.step__card h3 {
-  margin: 0 0 0.6rem;
-  font-size: 1.6rem;
+.panel-card h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.25rem;
 }
 
-.step__card p {
+.panel-card p {
   margin: 0;
-  font-size: 1.1rem;
-  line-height: 1.6;
+  font-size: 0.95rem;
+  line-height: 1.55;
   color: var(--ink-soft);
 }
 
@@ -563,28 +584,39 @@ strong {
 
   .scrolly {
     flex-direction: column;
+    gap: 0;
   }
 
+  /* On mobile, stack: big sticky viz on top, pinned text card overlaid at the
+     bottom of the screen. */
   .scrolly__graphic {
-    position: sticky;
-    top: 0;
-    z-index: 0;
+    flex: 1 1 auto;
+    width: 100%;
+    order: 1;
   }
 
   .scrolly__sticky {
-    height: 60svh;
+    height: 62svh;
   }
 
-  .scrolly__steps {
-    z-index: 1;
+  .scrolly__aside {
+    flex: 1 1 auto;
+    width: 100%;
+    order: 0;
+    margin-top: -62svh;
+    z-index: 2;
+    pointer-events: none;
   }
 
-  .step {
-    min-height: 80svh;
+  .scrolly__panel {
+    height: 62svh;
+    align-items: flex-end;
+    justify-content: center;
   }
 
-  .step__card {
-    margin: 0 0.5rem;
+  .panel-card {
+    margin: 0 0.5rem 1rem;
+    pointer-events: auto;
   }
 }
 

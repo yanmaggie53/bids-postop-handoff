@@ -21,12 +21,12 @@
       <div class="hero__inner">
         <p class="hero__eyebrow">A Quality Improvement Study</p>
         <h1 class="hero__title">
-          The OR&#8202;&rarr;&#8202;ICU<br />Handoff
+          The Postoperative<br />Handoff Process
         </h1>
         <p class="hero__subtitle">
-          Rethinking how surgical teams hand off patients to intensive care.
+          Optimizing how surgical teams transfer patients to the ICU/PACU.
         </p>
-        <p class="hero__byline">By Your Name</p>
+        <p class="hero__byline">By Maggie Yan</p>
       </div>
       <div class="scroll-cue" aria-hidden="true">
         <span>Scroll</span>
@@ -110,39 +110,46 @@
 
       <!-- 6. WORKFLOW VISUALIZATION (the snake timeline) -->
       <section class="scrolly" id="timeline">
-        <div class="scrolly__graphic">
+        <!-- The visualization is the large scrolling column; invisible step
+             triggers inside it drive the animation. The SVG stays sticky so it
+             remains centered and visible while it animates. -->
+        <div class="scrolly__graphic" id="timeline-steps">
           <div class="scrolly__sticky" id="timeline-sticky">
             <!-- SVG injected by src/sections/timeline.js -->
           </div>
+          <div class="scrolly__triggers">
+            <div class="trigger" data-step="0"></div>
+            <div class="trigger" data-step="1"></div>
+            <div class="trigger" data-step="2"></div>
+            <div class="trigger" data-step="3"></div>
+            <div class="trigger" data-step="4"></div>
+          </div>
         </div>
-        <div class="scrolly__steps" id="timeline-steps">
-          <div class="step" data-step="0">
-            <div class="step__card">
+
+        <!-- The text blurbs are static (pinned) and smaller. One shows at a
+             time, driven by the active step. -->
+        <aside class="scrolly__aside">
+          <div class="scrolly__panel" id="timeline-panel">
+            <div class="panel-card" data-step="0">
               <h3>The current workflow</h3>
               <p>
                 Here is how a typical OR-to-ICU handoff unfolds today, from the
                 end of surgery to the ICU bedside.
               </p>
             </div>
-          </div>
-          <div class="step" data-step="1">
-            <div class="step__card">
+            <div class="panel-card" data-step="1">
               <p>
                 Each stop along the way is a moment where information is
                 exchanged &mdash; and a moment where it can be lost.
               </p>
             </div>
-          </div>
-          <div class="step" data-step="2">
-            <div class="step__card">
+            <div class="panel-card" data-step="2">
               <p>
                 Following the patient from the OR through transport to the ICU,
                 the path winds through several distinct phases.
               </p>
             </div>
-          </div>
-          <div class="step" data-step="3">
-            <div class="step__card">
+            <div class="panel-card" data-step="3">
               <h3>The proposed workflow</h3>
               <p>
                 Rather than redesigning the whole process, we propose inserting a
@@ -150,9 +157,7 @@
                 Watch the timeline stretch to make room for it.
               </p>
             </div>
-          </div>
-          <div class="step" data-step="4">
-            <div class="step__card">
+            <div class="panel-card" data-step="4">
               <p>
                 The new step (highlighted) adds a brief, standardized pause
                 &mdash; ensuring nothing critical is missed before the OR team
@@ -160,7 +165,7 @@
               </p>
             </div>
           </div>
-        </div>
+        </aside>
       </section>
 
       <!-- 7. FINDINGS SECTION TITLE -->
