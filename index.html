@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="An interactive presentation of an OR-ICU postoperative handoff quality improvement study."
+    />
+    <title>The OR-to-ICU Handoff</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Archivo:wght@400;600;800&family=Archivo+Black&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <!-- 1. HERO -->
+    <header class="hero" id="hero">
+      <div class="hero__inner">
+        <p class="hero__eyebrow">A Quality Improvement Study</p>
+        <h1 class="hero__title">
+          The OR&#8202;&rarr;&#8202;ICU<br />Handoff
+        </h1>
+        <p class="hero__subtitle">
+          Rethinking how surgical teams hand off patients to intensive care.
+        </p>
+        <p class="hero__byline">By Your Name</p>
+      </div>
+      <div class="scroll-cue" aria-hidden="true">
+        <span>Scroll</span>
+        <span class="scroll-cue__arrow">&darr;</span>
+      </div>
+    </header>
+
+    <main>
+      <!-- 2. PROBLEM & GOAL -->
+      <section class="prose" id="problem">
+        <p class="prose__kicker">The problem</p>
+        <p>
+          When a patient leaves the operating room for the intensive care unit,
+          a great deal of critical information has to travel with them &mdash;
+          what happened during surgery, which medications are running, what the
+          team should watch for next. That transfer of information is called a
+          <em>handoff</em>, and it is one of the most fragile moments in a
+          patient&rsquo;s care.
+        </p>
+        <p>
+          Handoffs are often rushed, inconsistent, and dependent on memory.
+          Important details can be lost in the noise of moving a patient,
+          connecting monitors, and managing a fresh post-surgical case.
+        </p>
+        <p class="prose__lead">
+          The goal of this study is to understand the current OR-to-ICU handoff
+          workflow as it actually happens and to find practical ways to
+          make it safer and more consistent.
+        </p>
+      </section>
+
+      <!-- 3. DATA COLLECTION METHODOLOGY -->
+      <section class="prose" id="methods-collection">
+        <p class="prose__kicker">How I collect data</p>
+        <p>
+          To understand the workflow, I observe it directly. I sit in on
+          operating rooms at the end of surgeries and take notes on how
+          clinicians work together to prepare a patient for transfer to the ICU.
+        </p>
+        <p>
+          Then I follow the team as they transport the patient, observing and
+          taking notes the entire way &mdash; including how the OR team delivers
+          their handoff report once they arrive in the ICU.
+        </p>
+        <p>
+          Throughout, I also bring awareness to a postoperative handoff report
+          tool already built into Epic, encouraging the OR team (especially the
+          anesthesiologists) and the ICU clinicians to use it during the
+          handoff.
+        </p>
+      </section>
+
+      <!-- 4. EPIC HANDOFF TOOL (interactive screenshots) -->
+      <section class="scroll-section" id="epic-tool">
+        <div class="scroll-section__intro prose">
+          <p class="prose__kicker">The Epic handoff tool</p>
+          <p>
+            This is the postoperative handoff report tool embedded in Epic.
+            <strong>Click the screen</strong> to step through the workflow of
+            using it.
+          </p>
+        </div>
+        <div class="screenshots" id="screenshots-stage">
+          <!-- populated by src/sections/screenshots.js -->
+        </div>
+      </section>
+
+      <!-- 5. EDUCATIONAL EFFORTS (flyers) -->
+      <section class="scroll-section" id="flyers">
+        <div class="scroll-section__intro prose">
+          <p class="prose__kicker">Spreading the word</p>
+          <p>
+            To encourage clinicians to use the handoff tool, I designed
+            educational flyers placed throughout the OR and ICU areas.
+          </p>
+        </div>
+        <div class="flyers" id="flyers-gallery">
+          <!-- populated by src/sections/flyers.js -->
+        </div>
+      </section>
+
+      <!-- 6. WORKFLOW VISUALIZATION (the snake timeline) -->
+      <section class="scrolly" id="timeline">
+        <div class="scrolly__graphic">
+          <div class="scrolly__sticky" id="timeline-sticky">
+            <!-- SVG injected by src/sections/timeline.js -->
+          </div>
+        </div>
+        <div class="scrolly__steps" id="timeline-steps">
+          <div class="step" data-step="0">
+            <div class="step__card">
+              <h3>The current workflow</h3>
+              <p>
+                Here is how a typical OR-to-ICU handoff unfolds today, from the
+                end of surgery to the ICU bedside.
+              </p>
+            </div>
+          </div>
+          <div class="step" data-step="1">
+            <div class="step__card">
+              <p>
+                Each stop along the way is a moment where information is
+                exchanged &mdash; and a moment where it can be lost.
+              </p>
+            </div>
+          </div>
+          <div class="step" data-step="2">
+            <div class="step__card">
+              <p>
+                Following the patient from the OR through transport to the ICU,
+                the path winds through several distinct phases.
+              </p>
+            </div>
+          </div>
+          <div class="step" data-step="3">
+            <div class="step__card">
+              <h3>The proposed workflow</h3>
+              <p>
+                Rather than redesigning the whole process, we propose inserting a
+                small, deliberate step: a structured handoff using the Epic tool.
+                Watch the timeline stretch to make room for it.
+              </p>
+            </div>
+          </div>
+          <div class="step" data-step="4">
+            <div class="step__card">
+              <p>
+                The new step (highlighted) adds a brief, standardized pause
+                &mdash; ensuring nothing critical is missed before the OR team
+                leaves.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7. FINDINGS SECTION TITLE -->
+      <section class="section-divider" id="findings">
+        <h2 class="section-divider__title">Findings &amp; Analysis</h2>
+      </section>
+
+      <!-- 8. ANALYSIS METHODOLOGY -->
+      <section class="prose" id="methods-analysis">
+        <p class="prose__kicker">How I analyze the data</p>
+        <p>
+          I transcribe my handwritten observations into a spreadsheet, splitting
+          each sentence into its own row so that nothing slips through.
+        </p>
+        <p>
+          Then I read every row and code it, looking for clinician feedback that
+          falls into one of five categories:
+        </p>
+        <ul class="prose__list">
+          <li><strong>Challenges</strong> with the workflow or the tool itself</li>
+          <li><strong>Usefulness</strong> &mdash; where the tool genuinely helps</li>
+          <li><strong>Suggestions</strong> for improvement</li>
+          <li><strong>Elements liked</strong> about the tool</li>
+          <li><strong>Elements disliked</strong> about the tool</li>
+        </ul>
+        <p class="prose__note">
+          The charts below use placeholder data. Each bubble is a single piece of
+          feedback; bigger bubbles mean more clinicians said the same thing.
+        </p>
+      </section>
+
+      <!-- 9. BUBBLE CHARTS -->
+      <section class="bubbles-section" id="bubbles">
+        <!-- chart blocks injected by src/sections/bubbles.js -->
+      </section>
+
+      <!-- 10. SOURCES -->
+      <section class="prose sources" id="sources">
+        <p class="prose__kicker">Sources cited</p>
+        <ol class="sources__list">
+          <li>
+            Placeholder reference &mdash; Author, A. (Year).
+            <em>Title of the work</em>. Publisher / Journal.
+          </li>
+          <li>
+            Placeholder reference &mdash; Author, B. (Year).
+            <em>Title of the work</em>. Publisher / Journal.
+          </li>
+          <li>
+            Placeholder reference &mdash; Author, C. (Year).
+            <em>Title of the work</em>. Publisher / Journal.
+          </li>
+        </ol>
+        <p class="sources__footer">
+          An interactive research presentation &middot; Built with scrollytelling.
+        </p>
+      </section>
+    </main>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

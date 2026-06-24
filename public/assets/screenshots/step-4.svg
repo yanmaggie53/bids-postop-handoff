@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" role="img" aria-label="Epic handoff tool screenshot placeholder, step 4">
+  <rect width="1200" height="750" fill="#eef1f4"/>
+  <rect x="0" y="0" width="1200" height="64" fill="#1f3a5f"/>
+  <circle cx="36" cy="32" r="10" fill="#e9a020"/>
+  <text x="64" y="40" font-family="Archivo, sans-serif" font-size="22" fill="#ffffff" font-weight="700">Epic &mdash; Share With ICU</text>
+  <rect x="300" y="180" width="600" height="360" rx="14" fill="#ffffff" stroke="#cdd6e0" stroke-width="2"/>
+  <circle cx="600" cy="300" r="64" fill="#2a9d8f"/>
+  <path d="M572 300 l20 22 l40 -46" stroke="#ffffff" stroke-width="10" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="600" y="420" font-family="Archivo, sans-serif" font-size="28" fill="#1f3a5f" font-weight="800" text-anchor="middle">Report shared</text>
+  <text x="600" y="462" font-family="Lora, serif" font-size="18" fill="#5a6b7b" text-anchor="middle">The ICU team can now review the structured handoff.</text>
+  <text x="600" y="650" font-family="Archivo, sans-serif" font-size="40" fill="#9aa7b4" font-weight="800" text-anchor="middle">SCREENSHOT PLACEHOLDER &mdash; STEP 4</text>
+</svg>

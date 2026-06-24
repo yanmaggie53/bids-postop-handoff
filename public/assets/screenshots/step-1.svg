@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" role="img" aria-label="Epic handoff tool screenshot placeholder, step 1">
+  <rect width="1200" height="750" fill="#eef1f4"/>
+  <rect x="0" y="0" width="1200" height="64" fill="#1f3a5f"/>
+  <circle cx="36" cy="32" r="10" fill="#e9a020"/>
+  <text x="64" y="40" font-family="Archivo, sans-serif" font-size="22" fill="#ffffff" font-weight="700">Epic &mdash; Postoperative Handoff</text>
+  <rect x="48" y="112" width="520" height="40" rx="6" fill="#cdd6e0"/>
+  <rect x="48" y="176" width="1104" height="2" fill="#cdd6e0"/>
+  <rect x="48" y="208" width="700" height="24" rx="4" fill="#dde3ea"/>
+  <rect x="48" y="252" width="600" height="24" rx="4" fill="#dde3ea"/>
+  <rect x="880" y="640" width="272" height="60" rx="8" fill="#2a9d8f"/>
+  <text x="1016" y="678" font-family="Archivo, sans-serif" font-size="22" fill="#ffffff" font-weight="700" text-anchor="middle">Open Report</text>
+  <text x="600" y="420" font-family="Archivo, sans-serif" font-size="40" fill="#9aa7b4" font-weight="800" text-anchor="middle">SCREENSHOT PLACEHOLDER &mdash; STEP 1</text>
+</svg>
