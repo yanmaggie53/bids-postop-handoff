@@ -347,147 +347,112 @@ strong {
   opacity: 1;
 }
 
-/* ---------- SCROLLY (timeline) ---------- */
-/* The visualization is the large scrolling column; the text aside is pinned. */
-.scrolly {
-  position: relative;
-  display: flex;
-  gap: 2.5rem;
-  max-width: 1400px;
+/* ---------- WORKFLOW VISUALIZATION (tall, dark, scroll-through) ---------- */
+.workflow {
+  --wf-bg: #10141c;
+  --wf-ink: #f3f0e9;
+  --wf-ink-soft: #9aa6b6;
+  background: var(--wf-bg);
+  color: var(--wf-ink);
+  padding: 6rem 1.5rem 4rem;
+}
+
+.workflow__header {
+  max-width: 40rem;
+  margin: 0 auto 1rem;
+  text-align: center;
+}
+
+.workflow__kicker {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #67d4c1;
+  margin: 0 0 1rem;
+}
+
+.workflow__title {
+  color: var(--wf-ink);
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  margin: 0 0 1rem;
+}
+
+.workflow__intro {
+  color: var(--wf-ink-soft);
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+/* The visualization itself: a tall SVG you scroll through. */
+.workflow__viz {
+  max-width: 720px;
   margin: 0 auto;
-  padding: 0 1.5rem;
-  align-items: flex-start;
 }
 
-/* Big visualization column: holds the sticky SVG + invisible scroll triggers. */
-.scrolly__graphic {
-  flex: 1 1 70%;
-  position: relative;
-}
-
-.scrolly__sticky {
-  position: sticky;
-  top: 0;
-  height: 100svh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1;
-}
-
-.scrolly__sticky svg {
+.tl-svg {
   width: 100%;
-  height: 96%;
+  height: auto;
+  display: block;
   overflow: visible;
 }
 
-/* Invisible blocks that drive Scrollama. They overlay the sticky graphic and
-   give the column its scroll height. */
-.scrolly__triggers {
-  position: relative;
-  margin-top: -100svh;
-  z-index: 0;
-  pointer-events: none;
-}
-
-.trigger {
-  height: 95svh;
-}
-
-.trigger:first-child {
-  height: 70svh;
-}
-
-.trigger:last-child {
-  height: 110svh;
-}
-
-/* Narrow pinned text column. */
-.scrolly__aside {
-  flex: 0 0 26%;
-  position: relative;
-}
-
-.scrolly__panel {
-  position: sticky;
-  top: 0;
-  height: 100svh;
-  display: flex;
-  align-items: center;
-}
-
-.panel-card {
-  position: absolute;
-  background: rgba(250, 247, 242, 0.94);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 1.25rem 1.4rem;
-  box-shadow: 0 10px 30px rgba(31, 58, 95, 0.1);
-  opacity: 0;
-  transform: translateY(10px);
-  transition: opacity 0.45s ease, transform 0.45s ease;
-  pointer-events: none;
-}
-
-.panel-card.is-active {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
-}
-
-.panel-card h3 {
-  margin: 0 0 0.5rem;
-  font-size: 1.25rem;
-}
-
-.panel-card p {
-  margin: 0;
-  font-size: 0.95rem;
-  line-height: 1.55;
-  color: var(--ink-soft);
-}
-
-/* timeline svg pieces */
+/* Path segments: faint track + colored draw-in. */
 .tl-path-bg {
   fill: none;
-  stroke: var(--line);
-  stroke-width: 6;
+  stroke: rgba(243, 240, 233, 0.12);
+  stroke-width: 5;
   stroke-linecap: round;
 }
 
 .tl-path-fg {
   fill: none;
-  stroke: var(--navy);
-  stroke-width: 6;
+  stroke-width: 5;
   stroke-linecap: round;
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.15));
 }
 
+/* Nodes. */
 .tl-node circle {
-  fill: var(--paper);
-  stroke: var(--navy);
-  stroke-width: 4;
+  stroke: var(--wf-bg);
+  stroke-width: 3;
+  transition: opacity 0.4s ease;
 }
 
 .tl-node.is-proposed circle {
-  stroke: var(--accent);
+  stroke: var(--wf-ink);
+  stroke-dasharray: 3 3;
 }
 
-.tl-node.is-proposed .tl-node__pulse {
-  fill: var(--accent);
-}
-
-.tl-node text {
+.tl-node__label {
   font-family: var(--font-display);
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 600;
-  fill: var(--ink);
+  fill: var(--wf-ink);
 }
 
 .tl-node__detail {
-  font-family: var(--font-body) !important;
-  font-size: 12px !important;
-  font-weight: 400 !important;
-  fill: var(--ink-soft) !important;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 400;
+  fill: var(--wf-ink-soft);
+}
+
+/* Inline phase titles. */
+.tl-phase-title__name {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.tl-phase-title__where {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 13px;
+  fill: var(--wf-ink-soft);
 }
 
 /* ---------- BUBBLES ---------- */
@@ -582,41 +547,16 @@ strong {
     font-size: 1.1rem;
   }
 
-  .scrolly {
-    flex-direction: column;
-    gap: 0;
+  .workflow {
+    padding: 4rem 1rem 3rem;
   }
 
-  /* On mobile, stack: big sticky viz on top, pinned text card overlaid at the
-     bottom of the screen. */
-  .scrolly__graphic {
-    flex: 1 1 auto;
-    width: 100%;
-    order: 1;
+  .tl-node__label {
+    font-size: 19px;
   }
 
-  .scrolly__sticky {
-    height: 62svh;
-  }
-
-  .scrolly__aside {
-    flex: 1 1 auto;
-    width: 100%;
-    order: 0;
-    margin-top: -62svh;
-    z-index: 2;
-    pointer-events: none;
-  }
-
-  .scrolly__panel {
-    height: 62svh;
-    align-items: flex-end;
-    justify-content: center;
-  }
-
-  .panel-card {
-    margin: 0 0.5rem 1rem;
-    pointer-events: auto;
+  .tl-node__detail {
+    font-size: 14px;
   }
 }
 

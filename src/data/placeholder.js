@@ -37,20 +37,52 @@ export const flyers = [
   },
 ];
 
-// Timeline steps. Each step's `t` is its position along the path (0-1).
-// `proposed: true` marks steps that only appear in the proposed workflow.
-export const timelineSteps = [
-  { id: "or-end", label: "Surgery ends", detail: "OR team begins prep for transfer." },
-  { id: "prep", label: "Patient prep", detail: "Lines, drips, and monitors readied." },
-  { id: "transport", label: "Transport", detail: "Patient moved from OR to ICU." },
+// Workflow timeline, organized into three connected phases. Each phase is a
+// winding "snake" of its own color; together they flow into one continuous
+// path. Nodes within a phase appear in order.
+//
+// Steps flagged `proposed: true` only appear once the proposed-workflow
+// animation is triggered; they are inserted into the middle (handoff) phase.
+export const timelinePhases = [
   {
-    id: "structured-handoff",
-    label: "Structured handoff",
-    detail: "Brief, standardized handoff using the Epic tool.",
-    proposed: true,
+    id: "pre-handoff",
+    title: "Pre-Handoff Process",
+    where: "In the OR",
+    color: "#67d4c1", // teal
+    steps: [
+      { id: "surgery-ends", label: "Surgery ends", detail: "Procedure completed; emergence begins." },
+      { id: "prep", label: "Patient prep", detail: "Lines, drips, and monitors readied for transfer." },
+      { id: "or-summary", label: "OR debrief", detail: "Team confirms counts and intra-op events." },
+    ],
   },
-  { id: "icu-arrival", label: "ICU arrival", detail: "Patient connected to ICU monitors." },
-  { id: "report", label: "Handoff report", detail: "OR team delivers verbal report." },
+  {
+    id: "handoff",
+    title: "Postoperative Handoff",
+    where: "ICU \u2014 between the OR & ICU teams",
+    color: "#ffd166", // amber
+    steps: [
+      { id: "transport", label: "Transport", detail: "Patient moved from OR to ICU." },
+      { id: "icu-connect", label: "ICU connect", detail: "Patient connected to ICU monitors and lines." },
+      {
+        id: "structured-handoff",
+        label: "Structured handoff",
+        detail: "Brief, standardized handoff using the Epic tool.",
+        proposed: true,
+      },
+      { id: "verbal-report", label: "Verbal report", detail: "OR team delivers the handoff report." },
+    ],
+  },
+  {
+    id: "post-handoff",
+    title: "Post-Handoff Process",
+    where: "ICU team takes over",
+    color: "#f78fb3", // pink
+    steps: [
+      { id: "questions", label: "Q&A", detail: "ICU team asks clarifying questions." },
+      { id: "plan", label: "Care plan", detail: "ICU sets the initial post-op plan." },
+      { id: "stabilize", label: "Stabilize", detail: "Ongoing ICU monitoring and care." },
+    ],
+  },
 ];
 
 // Bubble chart data, one dataset per category.

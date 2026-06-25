@@ -1,242 +1,284 @@
-import scrollama from "scrollama";
-import { timelineSteps } from "../data/placeholder.js";
+import { timelinePhases } from "../data/placeholder.js";
 
-// Winding "snake" workflow timeline.
+// Tall, scroll-through workflow visualization.
 //
-// Two SVG paths share the same silhouette, but `proposed` is stretched open at
-// the insertion point to make room for the highlighted proposed step. We
-// interpolate between them on scroll and re-sample node positions live with
-// getPointAtLength, so nodes ride along the path as it morphs.
+// One continuous winding "snake" made of three connected phases, each in its
+// own color. The path draws in as you scroll, and nodes pop in as the drawn
+// length reaches them. The middle (handoff) phase contains a `proposed` step
+// that expands into place once that phase enters view.
 
-const VIEW_W = 760;
-const VIEW_H = 1100;
+const svgNS = "http://www.w3.org/2000/svg";
 
-// Current workflow: a winding path with 5 stops (no proposed step).
-// Each command count is kept identical between the two paths so we can
-// interpolate command-by-command.
-const PATH_CURRENT = [
-  "M 130 90",
-  "C 130 90 630 90 630 250",
-  "C 630 410 130 350 130 510",
-  "C 130 670 630 610 630 770",
-  "C 630 930 130 930 130 1010",
-].join(" ");
-
-// Proposed workflow: same shape, but the third bend is pulled out wider/longer
-// to open a gap where the new structured-handoff step is inserted.
-const PATH_PROPOSED = [
-  "M 130 90",
-  "C 130 90 660 90 660 250",
-  "C 660 430 100 360 100 540",
-  "C 100 760 680 660 680 840",
-  "C 680 1020 130 1010 130 1010",
-].join(" ");
-
-// Anchor positions (fraction along the path) for each node, for each state.
-// In the "current" state the proposed step shares a position with its neighbor
-// and is hidden; in the "proposed" state it spreads into its own slot.
-const ANCHORS_CURRENT = [0.0, 0.26, 0.5, 0.5, 0.74, 1.0];
-const ANCHORS_PROPOSED = [0.0, 0.2, 0.4, 0.58, 0.78, 1.0];
+const VIEW_W = 600;
+// Vertical space allotted to each node along the snake.
+const NODE_GAP = 230;
+const TOP_PAD = 120;
+const BOTTOM_PAD = 140;
+// Horizontal extremes of the winding path.
+const X_LEFT = 150;
+const X_RIGHT = 450;
 
 function lerp(a, b, t) {
   return a + (b - a) * t;
 }
 
-// Interpolate two path "d" strings that share an identical command structure.
-function makePathInterpolator(d0, d1) {
-  const nums0 = d0.match(/-?\d+\.?\d*/g).map(Number);
-  const nums1 = d1.match(/-?\d+\.?\d*/g).map(Number);
-  const tokens = d0.split(/(-?\d+\.?\d*)/);
-  let numIndex = 0;
-  const template = tokens.map((tok) => {
-    if (/-?\d+\.?\d*/.test(tok)) {
-      const i = numIndex++;
-      return { num: true, a: nums0[i], b: nums1[i] };
-    }
-    return { num: false, text: tok };
-  });
-  return (t) =>
-    template
-      .map((part) => (part.num ? lerp(part.a, part.b, t).toFixed(2) : part.text))
-      .join("");
+// Build a smooth winding path through a list of {x, y} points using cubic
+// segments with vertical control handles (gives the snake its rounded bends).
+function buildPath(points) {
+  if (points.length === 0) return "";
+  let d = `M ${points[0].x} ${points[0].y}`;
+  for (let i = 1; i < points.length; i++) {
+    const p0 = points[i - 1];
+    const p1 = points[i];
+    const cy = (p0.y + p1.y) / 2;
+    d += ` C ${p0.x} ${cy}, ${p1.x} ${cy}, ${p1.x} ${p1.y}`;
+  }
+  return d;
 }
 
 export function initTimeline() {
   const sticky = document.getElementById("timeline-sticky");
-  const stepsRoot = document.getElementById("timeline-steps");
-  if (!sticky || !stepsRoot) return;
+  const section = document.getElementById("timeline");
+  if (!sticky || !section) return;
 
-  const svgNS = "http://www.w3.org/2000/svg";
+  // Flatten phases into an ordered list of nodes, alternating x to make the
+  // snake wind left/right down the canvas.
+  const nodes = [];
+  timelinePhases.forEach((phase, phaseIndex) => {
+    phase.steps.forEach((step) => {
+      nodes.push({ ...step, phase, phaseIndex });
+    });
+  });
+
+  // Assign positions. Each node gets a row; x alternates between left/right.
+  // We compute two layouts: "current" (proposed steps collapsed onto their
+  // predecessor and hidden) and "proposed" (proposed steps occupy their own
+  // row, pushing everything below them down).
+  function layout(includeProposed) {
+    const placed = [];
+    let row = 0;
+    nodes.forEach((node) => {
+      if (node.proposed && !includeProposed) {
+        // Collapse onto the previous node's position (hidden).
+        const prev = placed[placed.length - 1];
+        placed.push({ node, x: prev.x, y: prev.y, row: prev.row, collapsed: true });
+        return;
+      }
+      const x = row % 2 === 0 ? X_LEFT : X_RIGHT;
+      const y = TOP_PAD + row * NODE_GAP;
+      placed.push({ node, x, y, row, collapsed: false });
+      row++;
+    });
+    const totalRows = row;
+    const height = TOP_PAD + (totalRows - 1) * NODE_GAP + BOTTOM_PAD;
+    return { placed, height };
+  }
+
+  const layoutCurrent = layout(false);
+  const layoutProposed = layout(true);
+  // The SVG must be tall enough for the larger (proposed) layout.
+  const VIEW_H = layoutProposed.height;
+
+  // SVG setup. It is tall; the section scrolls through it.
   const svg = document.createElementNS(svgNS, "svg");
   svg.setAttribute("viewBox", `0 0 ${VIEW_W} ${VIEW_H}`);
-  svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+  svg.setAttribute("preserveAspectRatio", "xMidYMin meet");
+  svg.setAttribute("class", "tl-svg");
 
-  // Background (faint full path) + foreground (the drawn-in progress path).
-  const bgPath = document.createElementNS(svgNS, "path");
-  bgPath.setAttribute("class", "tl-path-bg");
-  bgPath.setAttribute("d", PATH_CURRENT);
+  // Two layers: paths/titles beneath, nodes on top.
+  const layerPaths = document.createElementNS(svgNS, "g");
+  const layerNodes = document.createElementNS(svgNS, "g");
+  svg.append(layerPaths, layerNodes);
 
-  const fgPath = document.createElementNS(svgNS, "path");
-  fgPath.setAttribute("class", "tl-path-fg");
-  fgPath.setAttribute("d", PATH_CURRENT);
-
-  // A hidden measuring path we can sample with getPointAtLength.
-  const measurePath = document.createElementNS(svgNS, "path");
-  measurePath.setAttribute("d", PATH_CURRENT);
-  measurePath.setAttribute("fill", "none");
-  measurePath.setAttribute("stroke", "none");
-
-  svg.append(bgPath, fgPath, measurePath);
-
-  const interp = makePathInterpolator(PATH_CURRENT, PATH_PROPOSED);
-
-  // Build node groups.
-  const nodes = timelineSteps.map((step, i) => {
+  // Build node DOM.
+  const nodeEls = nodes.map((node) => {
     const g = document.createElementNS(svgNS, "g");
-    g.setAttribute("class", "tl-node" + (step.proposed ? " is-proposed" : ""));
-
-    const pulse = document.createElementNS(svgNS, "circle");
-    pulse.setAttribute("class", "tl-node__pulse");
-    pulse.setAttribute("r", "18");
-    pulse.setAttribute("fill", "none");
-    pulse.setAttribute("opacity", "0");
+    g.setAttribute("class", "tl-node" + (node.proposed ? " is-proposed" : ""));
 
     const circle = document.createElementNS(svgNS, "circle");
-    circle.setAttribute("r", "13");
+    circle.setAttribute("r", "16");
+    circle.setAttribute("fill", node.phase.color);
 
     const label = document.createElementNS(svgNS, "text");
-    label.setAttribute("x", "22");
-    label.setAttribute("y", "0");
-    label.textContent = step.label;
+    label.setAttribute("class", "tl-node__label");
+    label.textContent = node.label;
 
     const detail = document.createElementNS(svgNS, "text");
     detail.setAttribute("class", "tl-node__detail");
-    detail.setAttribute("x", "22");
-    detail.setAttribute("y", "18");
-    detail.textContent = step.detail;
+    detail.textContent = node.detail;
 
-    g.append(pulse, circle, label, detail);
-    svg.appendChild(g);
-    return { g, circle, label, detail, step, i };
+    g.append(circle, label, detail);
+    layerNodes.appendChild(g);
+    return { g, circle, label, detail, node };
+  });
+
+  // Phase title labels (inline, near the first node of each phase).
+  const phaseTitleEls = timelinePhases.map((phase) => {
+    const g = document.createElementNS(svgNS, "g");
+    g.setAttribute("class", "tl-phase-title");
+
+    const title = document.createElementNS(svgNS, "text");
+    title.setAttribute("class", "tl-phase-title__name");
+    title.setAttribute("fill", phase.color);
+    title.textContent = phase.title;
+
+    const where = document.createElementNS(svgNS, "text");
+    where.setAttribute("class", "tl-phase-title__where");
+    where.textContent = phase.where;
+
+    g.append(title, where);
+    layerPaths.appendChild(g);
+    return { g, title, where, phase };
   });
 
   sticky.appendChild(svg);
 
-  // Render the timeline at a given morph amount (0 = current, 1 = proposed)
-  // and reveal progress (0..1 of the path drawn + nodes shown).
+  // morph 0 -> current layout, 1 -> proposed layout. reveal 0..1 = draw-in.
   let morph = 0;
   let reveal = 0;
 
+  // Pre-create per-phase path elements (bg + fg) on top of node layer order.
+  const pathEls = timelinePhases.map((phase) => {
+    const bg = document.createElementNS(svgNS, "path");
+    bg.setAttribute("class", "tl-path-bg");
+    const fg = document.createElementNS(svgNS, "path");
+    fg.setAttribute("class", "tl-path-fg");
+    fg.setAttribute("stroke", phase.color);
+    // Insert paths beneath nodes.
+    layerPaths.append(bg, fg);
+    return { bg, fg, phase };
+  });
+
+  // Build the full ordered point list at a given morph, plus per-phase point
+  // groups so we can color each phase separately. Phases connect because the
+  // first point of a phase equals the last drawn point of the previous one.
+  function computePoints(m) {
+    const pts = nodeEls.map(({ node }, i) => {
+      const c = layoutCurrent.placed[i];
+      const p = layoutProposed.placed[i];
+      return {
+        x: lerp(c.x, p.x, m),
+        y: lerp(c.y, p.y, m),
+        node,
+        collapsed: c.collapsed && p.collapsed,
+      };
+    });
+    return pts;
+  }
+
   function render() {
-    const d = interp(morph);
-    bgPath.setAttribute("d", d);
-    fgPath.setAttribute("d", d);
-    measurePath.setAttribute("d", d);
+    const pts = computePoints(morph);
+    const totalHeight = VIEW_H;
 
-    const total = measurePath.getTotalLength();
+    // Group points by phase, chaining the boundary point so segments connect.
+    let cursor = 0;
+    timelinePhases.forEach((phase, pi) => {
+      const count = phase.steps.length;
+      const slice = pts.slice(cursor, cursor + count);
+      cursor += count;
 
-    // Draw-in effect on the foreground path.
-    fgPath.style.strokeDasharray = `${total}`;
-    fgPath.style.strokeDashoffset = `${total * (1 - reveal)}`;
+      // Connect to previous phase's last point for continuity.
+      const connectPts =
+        pi > 0 ? [pts[cursor - count - 1], ...slice] : slice;
 
-    nodes.forEach((node) => {
-      const tCur = ANCHORS_CURRENT[node.i];
-      const tPro = ANCHORS_PROPOSED[node.i];
-      const t = lerp(tCur, tPro, morph);
-      const pt = measurePath.getPointAtLength(total * t);
+      const d = buildPath(connectPts.map((p) => ({ x: p.x, y: p.y })));
+      const { bg, fg } = pathEls[pi];
+      bg.setAttribute("d", d);
+      fg.setAttribute("d", d);
 
-      node.g.setAttribute("transform", `translate(${pt.x}, ${pt.y})`);
+      // Draw-in per phase based on overall reveal mapped to this phase's band.
+      const len = fg.getTotalLength ? fg.getTotalLength() : 0;
+      const phaseStart = pi / timelinePhases.length;
+      const phaseEnd = (pi + 1) / timelinePhases.length;
+      const local = Math.max(
+        0,
+        Math.min(1, (reveal - phaseStart) / (phaseEnd - phaseStart))
+      );
+      fg.style.strokeDasharray = `${len}`;
+      fg.style.strokeDashoffset = `${len * (1 - local)}`;
+    });
 
-      // Reveal nodes as the path reaches them.
-      const reached = reveal >= t - 0.001;
-      let visible = reached;
+    // Position + reveal nodes.
+    nodeEls.forEach((el, i) => {
+      const p = pts[i];
+      el.g.setAttribute("transform", `translate(${p.x}, ${p.y})`);
 
-      // Proposed-only steps stay hidden until we morph toward proposed.
-      if (node.step.proposed) {
-        visible = reached && morph > 0.15;
-        node.circle.setAttribute("r", `${lerp(0, 13, Math.min(1, morph * 1.2))}`);
-        node.g.style.opacity = String(Math.min(1, morph * 1.4) * (reached ? 1 : 0.15));
+      const tY = (p.y - TOP_PAD) / (VIEW_H - TOP_PAD - BOTTOM_PAD);
+      const reached = reveal >= tY - 0.02;
+
+      if (el.node.proposed) {
+        const grow = Math.min(1, morph * 1.4);
+        el.circle.setAttribute("r", `${lerp(0, 16, grow)}`);
+        el.g.style.opacity = String((reached ? 1 : 0.12) * grow);
       } else {
-        node.g.style.opacity = visible ? "1" : "0.15";
+        el.g.style.opacity = reached ? "1" : "0.12";
       }
 
-      // Flip labels to the left side when the node sits on the right edge,
-      // so text never runs off the canvas.
-      const onRight = pt.x > VIEW_W * 0.6;
+      // Place label opposite the bend direction so it doesn't overlap the path.
+      const onRight = p.x >= (X_LEFT + X_RIGHT) / 2;
+      const dx = onRight ? -26 : 26;
       const anchor = onRight ? "end" : "start";
-      const dx = onRight ? -22 : 22;
-      node.label.setAttribute("text-anchor", anchor);
-      node.detail.setAttribute("text-anchor", anchor);
-      node.label.setAttribute("x", String(dx));
-      node.detail.setAttribute("x", String(dx));
+      el.label.setAttribute("x", dx);
+      el.label.setAttribute("y", -4);
+      el.label.setAttribute("text-anchor", anchor);
+      el.detail.setAttribute("x", dx);
+      el.detail.setAttribute("y", 16);
+      el.detail.setAttribute("text-anchor", anchor);
+    });
+
+    // Phase titles near each phase's first node.
+    let idx = 0;
+    phaseTitleEls.forEach((pt, pi) => {
+      const firstPoint = pts[idx];
+      idx += timelinePhases[pi].steps.length;
+      const x = 40;
+      const y = firstPoint.y - 70;
+      pt.g.setAttribute("transform", `translate(${x}, ${y})`);
+      pt.title.setAttribute("y", 0);
+      pt.where.setAttribute("y", 22);
+
+      const phaseStart = pi / timelinePhases.length;
+      pt.g.style.opacity = reveal >= phaseStart - 0.04 ? "1" : "0.12";
     });
   }
 
   render();
 
-  // Map scroll steps to (reveal, morph). Steps 0-2 draw in the current path;
-  // step 3+ morph to the proposed layout with the inserted step.
-  const stateByStep = [
-    { reveal: 0.34, morph: 0 },
-    { reveal: 0.62, morph: 0 },
-    { reveal: 1.0, morph: 0 },
-    { reveal: 1.0, morph: 1 },
-    { reveal: 1.0, morph: 1 },
-  ];
+  // Drive `reveal` and `morph` from scroll progress through the section.
+  function onScroll() {
+    const rect = section.getBoundingClientRect();
+    const vh = window.innerHeight;
+    // Progress: 0 when section top hits viewport top, 1 when bottom reaches
+    // viewport bottom. Tuned so the draw-in spans most of the scroll.
+    const total = rect.height - vh;
+    const scrolled = Math.min(Math.max(-rect.top, 0), Math.max(total, 1));
+    const progress = total > 0 ? scrolled / total : 0;
 
-  function setState(stepIndex) {
-    const s = stateByStep[Math.max(0, Math.min(stepIndex, stateByStep.length - 1))];
-    animateTo(s.reveal, s.morph);
-  }
+    reveal = Math.min(1, progress * 1.05);
 
-  // Simple eased tween between states (rAF based).
-  let raf = null;
-  function animateTo(targetReveal, targetMorph) {
-    cancelAnimationFrame(raf);
-    const startReveal = reveal;
-    const startMorph = morph;
-    const start = performance.now();
-    const dur = 700;
-    const ease = (x) => 1 - Math.pow(1 - x, 3);
+    // Start morphing the proposed step in once the middle phase is reaching.
+    const morphStart = 0.34;
+    const morphEnd = 0.5;
+    morph = Math.min(
+      1,
+      Math.max(0, (progress - morphStart) / (morphEnd - morphStart))
+    );
 
-    function tick(now) {
-      const p = Math.min(1, (now - start) / dur);
-      const e = ease(p);
-      reveal = lerp(startReveal, targetReveal, e);
-      morph = lerp(startMorph, targetMorph, e);
-      render();
-      if (p < 1) raf = requestAnimationFrame(tick);
-    }
-    raf = requestAnimationFrame(tick);
-  }
-
-  // The static (pinned) text panel: one card shown at a time.
-  const panel = document.getElementById("timeline-panel");
-  const panelCards = panel ? Array.from(panel.querySelectorAll(".panel-card")) : [];
-
-  function showPanel(idx) {
-    panelCards.forEach((card) => {
-      card.classList.toggle("is-active", Number(card.dataset.step) === idx);
-    });
-  }
-  showPanel(0);
-
-  // Scrollama wiring. The big visualization column scrolls; invisible
-  // `.trigger` blocks inside it advance the animation and the pinned text.
-  const scroller = scrollama();
-  scroller
-    .setup({
-      step: "#timeline-steps .trigger",
-      offset: 0.6,
-    })
-    .onStepEnter((response) => {
-      const idx = Number(response.element.dataset.step);
-      setState(idx);
-      showPanel(idx);
-    });
-
-  window.addEventListener("resize", () => {
-    scroller.resize();
     render();
-  });
+  }
+
+  let ticking = false;
+  function requestRender() {
+    if (!ticking) {
+      ticking = true;
+      requestAnimationFrame(() => {
+        onScroll();
+        ticking = false;
+      });
+    }
+  }
+
+  window.addEventListener("scroll", requestRender, { passive: true });
+  window.addEventListener("resize", requestRender);
+  onScroll();
 }
