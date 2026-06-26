@@ -1,71 +1,127 @@
-import { screenshots } from "../data/placeholder.js";
+import { handoffToolUi } from "../data/placeholder.js";
 
-// Click-to-advance carousel for the Epic handoff tool screenshots.
+// Handoff report tool UI: print-group reference images, desktop mockup, and
+// a scrollable mobile mockup.
 export function initScreenshots() {
-  const stageRoot = document.getElementById("screenshots-stage");
-  if (!stageRoot || screenshots.length === 0) return;
+  const root = document.getElementById("screenshots-stage");
+  if (!root) return;
 
-  let index = 0;
+  const { printGroups, desktop, mobile } = handoffToolUi;
 
-  const stage = document.createElement("div");
-  stage.className = "screenshots__stage";
-  stage.setAttribute("role", "button");
-  stage.setAttribute("tabindex", "0");
-  stage.setAttribute("aria-label", "Epic handoff tool workflow. Click or press Enter to advance.");
+  const prints = document.createElement("div");
+  prints.className = "tool-ui__prints";
 
-  const imgs = screenshots.map((shot, i) => {
+  const printItems = printGroups.map((item) => {
+    const fig = document.createElement("figure");
+    fig.className = "tool-ui__print";
+
+    const link = document.createElement("a");
+    link.href = item.src;
+    link.target = "_blank";
+    link.rel = "noopener";
+    link.className = "tool-ui__print-link";
+    link.setAttribute("aria-label", "Open print group full size in a new tab");
+
     const img = document.createElement("img");
-    img.className = "screenshots__img" + (i === 0 ? " is-active" : "");
-    img.src = shot.src;
-    img.alt = shot.caption;
+    img.src = item.src;
+    img.alt = item.alt;
+    img.loading = "lazy";
+
+    const hint = document.createElement("span");
+    hint.className = "tool-ui__zoom";
+    hint.textContent = "Open full size \u2197";
+
+    link.append(img, hint);
+    fig.appendChild(link);
+    prints.appendChild(fig);
+    return fig;
+  });
+
+  const desktopBlock = document.createElement("div");
+  desktopBlock.className = "tool-ui__block tool-ui__block--desktop is-visible";
+
+  const desktopLabel = document.createElement("p");
+  desktopLabel.className = "tool-ui__label";
+  desktopLabel.textContent = "Desktop (Epic Hyperspace)";
+
+  const desktopFrame = document.createElement("div");
+  desktopFrame.className = "device-mockup device-mockup--desktop";
+
+  const desktopChrome = document.createElement("div");
+  desktopChrome.className = "device-mockup__chrome";
+  desktopChrome.setAttribute("aria-hidden", "true");
+  desktopChrome.innerHTML =
+    '<span class="device-mockup__dot device-mockup__dot--red"></span>' +
+    '<span class="device-mockup__dot device-mockup__dot--yellow"></span>' +
+    '<span class="device-mockup__dot device-mockup__dot--green"></span>' +
+    '<span class="device-mockup__title">Anesthesia Record</span>';
+
+  const desktopScreen = document.createElement("div");
+  desktopScreen.className = "device-mockup__screen";
+
+  const desktopImg = document.createElement("img");
+  desktopImg.src = desktop.src;
+  desktopImg.alt = desktop.alt;
+  desktopImg.loading = "lazy";
+
+  desktopScreen.appendChild(desktopImg);
+  desktopFrame.append(desktopChrome, desktopScreen);
+  desktopBlock.append(desktopLabel, desktopFrame);
+
+  const mobileBlock = document.createElement("div");
+  mobileBlock.className = "tool-ui__block tool-ui__block--mobile is-visible";
+
+  const mobileLabel = document.createElement("p");
+  mobileLabel.className = "tool-ui__label";
+  mobileLabel.textContent = "Mobile (Epic Haiku)";
+
+  const mobileFrame = document.createElement("div");
+  mobileFrame.className = "device-mockup device-mockup--phone";
+
+  const mobileBezel = document.createElement("div");
+  mobileBezel.className = "device-mockup__bezel";
+
+  const mobileScreen = document.createElement("div");
+  mobileScreen.className = "device-mockup__screen device-mockup__screen--phone";
+  mobileScreen.setAttribute("tabindex", "0");
+  mobileScreen.setAttribute(
+    "aria-label",
+    "Scrollable Epic Haiku handoff report preview. Scroll inside the phone to review each section."
+  );
+
+  mobile.forEach((item) => {
+    const img = document.createElement("img");
+    img.className = "tool-ui__mobile-img";
+    img.src = item.src;
+    img.alt = item.alt;
+    img.width = item.width;
+    img.height = item.height;
+    img.loading = "lazy";
     img.draggable = false;
-    stage.appendChild(img);
-    return img;
+    mobileScreen.appendChild(img);
   });
 
-  const hint = document.createElement("div");
-  hint.className = "screenshots__hint";
-  hint.textContent = "Click to continue \u2192";
-  stage.appendChild(hint);
+  mobileBezel.appendChild(mobileScreen);
+  mobileFrame.appendChild(mobileBezel);
 
-  const caption = document.createElement("p");
-  caption.className = "screenshots__caption";
-  caption.textContent = screenshots[0].caption;
+  const scrollHint = document.createElement("p");
+  scrollHint.className = "tool-ui__scroll-hint";
+  scrollHint.textContent = "Scroll inside the phone \u2195";
 
-  const dots = document.createElement("div");
-  dots.className = "screenshots__dots";
-  const dotButtons = screenshots.map((_, i) => {
-    const dot = document.createElement("button");
-    dot.className = "screenshots__dot" + (i === 0 ? " is-active" : "");
-    dot.setAttribute("aria-label", `Go to screenshot ${i + 1}`);
-    dot.addEventListener("click", (e) => {
-      e.stopPropagation();
-      go(i);
-    });
-    dots.appendChild(dot);
-    return dot;
-  });
+  mobileBlock.append(mobileLabel, mobileFrame, scrollHint);
+  root.append(prints, desktopBlock, mobileBlock);
 
-  stageRoot.append(stage, caption, dots);
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.2 }
+  );
 
-  function go(next) {
-    index = (next + screenshots.length) % screenshots.length;
-    imgs.forEach((img, i) => img.classList.toggle("is-active", i === index));
-    dotButtons.forEach((dot, i) => dot.classList.toggle("is-active", i === index));
-    caption.textContent = screenshots[index].caption;
-    hint.textContent =
-      index === screenshots.length - 1 ? "Click to restart \u21BA" : "Click to continue \u2192";
-  }
-
-  stage.addEventListener("click", () => go(index + 1));
-  stage.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      go(index + 1);
-    } else if (e.key === "ArrowRight") {
-      go(index + 1);
-    } else if (e.key === "ArrowLeft") {
-      go(index - 1);
-    }
-  });
+  printItems.forEach((item) => observer.observe(item));
 }

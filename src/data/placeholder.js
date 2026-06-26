@@ -4,26 +4,67 @@
 // ("/bids-postop-handoff/"). Files live in public/assets/ and are served as-is.
 const asset = (p) => `${import.meta.env.BASE_URL}${p}`;
 
-// Epic handoff tool screenshots, in workflow order.
-// Drop real images into public/assets/screenshots/ and update the `src` paths.
-export const screenshots = [
-  {
-    src: asset("assets/screenshots/step-1.svg"),
-    caption: "1. Open the postoperative handoff report from the patient chart.",
+// Handoff report tool UI images (public/assets/screenshots/).
+export const handoffToolUi = {
+  printGroups: [
+    {
+      src: asset("assets/screenshots/Print-groups1.png"),
+      alt: "Reference guide to handoff report sections, part 1: anesthesia record through last vent parameters.",
+    },
+    {
+      src: asset("assets/screenshots/Print-groups2.png"),
+      alt: "Reference guide to handoff report sections, part 2: medication summary through encounter notes.",
+    },
+  ],
+  desktop: {
+    src: asset("assets/screenshots/HyperspaceUI.png"),
+    alt: "Epic Hyperspace desktop view of the postoperative anesthesia handoff report.",
   },
-  {
-    src: asset("assets/screenshots/step-2.svg"),
-    caption: "2. Review the auto-populated surgical and anesthesia summary.",
-  },
-  {
-    src: asset("assets/screenshots/step-3.svg"),
-    caption: "3. Add notes on lines, drips, and post-op concerns.",
-  },
-  {
-    src: asset("assets/screenshots/step-4.svg"),
-    caption: "4. Share the structured report with the receiving ICU team.",
-  },
-];
+  mobile: [
+    {
+      src: asset("assets/screenshots/HaikuUI1.png"),
+      alt: "Epic Haiku mobile handoff report, screen 1: patient details and procedure summary.",
+      width: 489,
+      height: 881,
+    },
+    {
+      src: asset("assets/screenshots/HaikuUI2.png"),
+      alt: "Epic Haiku mobile handoff report, screen 2: clinical history and care team.",
+      width: 491,
+      height: 881,
+    },
+    {
+      src: asset("assets/screenshots/HaikuUI3.png"),
+      alt: "Epic Haiku mobile handoff report, screen 3: medications and airway details.",
+      width: 491,
+      height: 881,
+    },
+    {
+      src: asset("assets/screenshots/HaikuUI4.png"),
+      alt: "Epic Haiku mobile handoff report, screen 4: intraoperative medications.",
+      width: 456,
+      height: 849,
+    },
+    {
+      src: asset("assets/screenshots/HaikuUI5.png"),
+      alt: "Epic Haiku mobile handoff report, screen 5: lines, I/O totals, and vitals.",
+      width: 456,
+      height: 849,
+    },
+    {
+      src: asset("assets/screenshots/HaikuUI6.png"),
+      alt: "Epic Haiku mobile handoff report, screen 6: preprocedure evaluation and meds.",
+      width: 456,
+      height: 849,
+    },
+    {
+      src: asset("assets/screenshots/HaikuUI7.png"),
+      alt: "Epic Haiku mobile handoff report, screen 7: vent settings, events, and handoff survey.",
+      width: 218,
+      height: 407,
+    },
+  ],
+};
 
 // Educational flyers. Drop real images into public/assets/flyers/.
 export const flyers = [

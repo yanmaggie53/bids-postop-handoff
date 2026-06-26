@@ -6,6 +6,7 @@
   --line: #d9d2c7;
   --navy: #1f3a5f;
   --accent: #d1495b;
+  --accent-deep: #b83a4a;
   --accent-2: #2a9d8f;
   --max-prose: 42rem;
 
@@ -206,86 +207,223 @@ strong {
   padding-bottom: 3rem;
 }
 
-/* ---------- SCREENSHOTS ---------- */
-.screenshots {
-  position: sticky;
-  top: 0;
-  min-height: 100svh;
+/* ---------- HANDOFF TOOL UI ---------- */
+.tool-ui {
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 4rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.tool-ui__prints {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
   justify-content: center;
-  gap: 1.25rem;
-}
-
-.screenshots__stage {
-  position: relative;
-  width: min(900px, 92vw);
-  aspect-ratio: 1200 / 750;
-  border-radius: 14px;
-  overflow: hidden;
-  box-shadow: 0 24px 60px rgba(31, 58, 95, 0.22);
-  cursor: pointer;
-  background: var(--paper-alt);
-}
-
-.screenshots__img {
-  position: absolute;
-  inset: 0;
+  align-items: flex-start;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+}
+
+.tool-ui__print {
+  flex: 0 1 440px;
+  margin: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 18px 44px rgba(31, 58, 95, 0.18);
   opacity: 0;
-  transform: scale(1.02);
-  transition: opacity 0.5s ease, transform 0.6s ease;
+  transform: translateY(32px);
+  transition: opacity 0.7s ease, transform 0.7s ease, box-shadow 0.3s ease;
 }
 
-.screenshots__img.is-active {
+.tool-ui__print.is-visible {
   opacity: 1;
-  transform: scale(1);
+  transform: translateY(0);
 }
 
-.screenshots__hint {
+.tool-ui__print:hover {
+  box-shadow: 0 24px 60px rgba(31, 58, 95, 0.28);
+}
+
+.tool-ui__print-link {
+  position: relative;
+  display: block;
+}
+
+.tool-ui__print img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.tool-ui__zoom {
   position: absolute;
-  bottom: 1rem;
-  right: 1rem;
-  background: rgba(31, 58, 95, 0.85);
+  bottom: 0.75rem;
+  right: 0.75rem;
+  background: rgba(31, 58, 95, 0.9);
   color: #fff;
   font-family: var(--font-display);
   font-size: 0.8rem;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.03em;
   padding: 0.4rem 0.8rem;
   border-radius: 999px;
-  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
-.screenshots__caption {
-  max-width: 38rem;
-  text-align: center;
-  font-size: var(--text-caption);
-  color: var(--ink-soft);
-  min-height: 3.4rem;
+.tool-ui__print-link:hover .tool-ui__zoom,
+.tool-ui__print-link:focus-visible .tool-ui__zoom {
+  opacity: 1;
 }
 
-.screenshots__dots {
+.tool-ui__block {
+  width: 100%;
   display: flex;
-  gap: 0.6rem;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
 }
 
-.screenshots__dot {
+.tool-ui__block.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.tool-ui__label {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-kicker);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+/* Shared device mockup chrome */
+.device-mockup__chrome {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.65rem 1rem;
+  background: #2b3038;
+  border-radius: 12px 12px 0 0;
+}
+
+.device-mockup__dot {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  border: none;
-  background: var(--line);
-  cursor: pointer;
-  padding: 0;
-  transition: background 0.3s ease, transform 0.3s ease;
 }
 
-.screenshots__dot.is-active {
-  background: var(--accent);
-  transform: scale(1.3);
+.device-mockup__dot--red {
+  background: #ff5f57;
+}
+
+.device-mockup__dot--yellow {
+  background: #febc2e;
+}
+
+.device-mockup__dot--green {
+  background: #28c840;
+}
+
+.device-mockup__title {
+  margin-left: 0.5rem;
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.device-mockup__screen {
+  background: #eef1f5;
+  overflow: hidden;
+}
+
+.device-mockup--desktop .device-mockup__screen img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Desktop monitor frame */
+.device-mockup--desktop {
+  width: 100%;
+  max-width: 920px;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow:
+    0 28px 70px rgba(31, 58, 95, 0.24),
+    0 0 0 1px rgba(31, 58, 95, 0.08);
+}
+
+.device-mockup--desktop .device-mockup__screen {
+  border-radius: 0 0 12px 12px;
+}
+
+/* Phone frame — fixed viewport; HaikuUI screens stack and scroll inside. */
+.device-mockup--phone {
+  width: auto;
+  margin: 0 auto;
+}
+
+.device-mockup__bezel {
+  padding: 0.85rem 0.65rem 1.1rem;
+  background: linear-gradient(160deg, #2a2f38 0%, #151820 100%);
+  border-radius: 36px;
+  box-shadow:
+    0 24px 60px rgba(31, 58, 95, 0.28),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.device-mockup__screen--phone {
+  /* Match HaikuUI native aspect (491×881). Width shrinks when height would
+     exceed the viewport so the phone stays tall/narrow, not square. */
+  width: min(491px, calc(100vw - 3rem), calc(78svh * 491 / 881));
+  aspect-ratio: 491 / 881;
+  margin: 0 auto;
+  border-radius: 24px;
+  background: #fff;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  line-height: 0;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(31, 58, 95, 0.35) transparent;
+}
+
+.device-mockup__screen--phone:focus-visible {
+  outline: 2px solid var(--accent-2);
+  outline-offset: 3px;
+}
+
+.device-mockup__screen--phone::-webkit-scrollbar {
+  width: 6px;
+}
+
+.device-mockup__screen--phone::-webkit-scrollbar-thumb {
+  background: rgba(31, 58, 95, 0.35);
+  border-radius: 999px;
+}
+
+.tool-ui__mobile-img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.tool-ui__scroll-hint {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
 }
 
 /* ---------- FLYERS ---------- */
@@ -627,6 +765,15 @@ strong {
   .flyers__item {
     flex: 0 1 100%;
     max-width: 360px;
+  }
+
+  .tool-ui__print {
+    flex: 0 1 100%;
+    max-width: 360px;
+  }
+
+  .device-mockup--desktop {
+    max-width: 100%;
   }
 }
 
