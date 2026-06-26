@@ -111,18 +111,17 @@ export function initTimeline() {
     return { placed, height };
   }
 
-  // The SVG must be tall enough for the largest layout (everything enabled).
-  const allEnabled = new Set(nodes.filter((n) => n.proposed).map((n) => n.id));
-  const maxLayout = layoutFor(allEnabled);
-  const VIEW_H = maxLayout.height;
+  // SVG viewBox height tracks the current layout (shrinks when proposed nodes
+  // are toggled off, expands when they're on).
+  let viewH = layoutFor(enabled).height;
 
   // Current and target positions per node (for animating toggles).
   let current = layoutFor(enabled).placed.map((p) => ({ x: p.x, y: p.y, collapsed: p.collapsed }));
   let target = current.map((p) => ({ ...p }));
 
-  // SVG setup. It is tall; the section scrolls through it.
+  // SVG setup. Height is driven by `viewH` and updates as toggles change.
   const svg = document.createElementNS(svgNS, "svg");
-  svg.setAttribute("viewBox", `0 0 ${VIEW_W} ${VIEW_H}`);
+  svg.setAttribute("viewBox", `0 0 ${VIEW_W} ${viewH}`);
   svg.setAttribute("preserveAspectRatio", "xMidYMin meet");
   svg.setAttribute("class", "tl-svg");
 
@@ -291,6 +290,7 @@ export function initTimeline() {
 
   function render() {
     const positions = current;
+    svg.setAttribute("viewBox", `0 0 ${VIEW_W} ${viewH}`);
 
     // Group points by phase, chaining the boundary point so segments connect.
     // Collapsed (hidden) proposed nodes are skipped from the path.
@@ -328,7 +328,7 @@ export function initTimeline() {
       fg.style.strokeDashoffset = `${len * (1 - local)}`;
     });
 
-    const drawableH = VIEW_H - TOP_PAD - BOTTOM_PAD;
+    const drawableH = viewH - TOP_PAD - BOTTOM_PAD;
 
     // Position + reveal nodes.
     nodeEls.forEach((el, i) => {
@@ -424,11 +424,14 @@ export function initTimeline() {
   // Animate node positions toward the layout for the current `enabled` set.
   let raf = null;
   function animateToLayout() {
-    target = layoutFor(enabled).placed.map((p) => ({ x: p.x, y: p.y, collapsed: p.collapsed }));
+    const nextLayout = layoutFor(enabled);
+    target = nextLayout.placed.map((p) => ({ x: p.x, y: p.y, collapsed: p.collapsed }));
+    const targetViewH = nextLayout.height;
 
     // Snap collapsed flags immediately for nodes that just turned ON so they
     // animate in from their predecessor; keep them collapsed-hidden when OFF.
     const start = current.map((p) => ({ ...p }));
+    const startViewH = viewH;
     // Starting position for a node newly turning on: its predecessor's spot.
     target.forEach((t, i) => {
       if (!t.collapsed && start[i].collapsed) {
@@ -452,8 +455,10 @@ export function initTimeline() {
         // Reveal as soon as we start (so it animates), hide only when fully off.
         collapsed: t.collapsed,
       }));
+      viewH = lerp(startViewH, targetViewH, e);
       render();
       if (k < 1) raf = requestAnimationFrame(tick);
+      else viewH = targetViewH;
     }
     raf = requestAnimationFrame(tick);
   }
