@@ -392,6 +392,11 @@ strong {
   margin: 0;
 }
 
+.workflow__chev {
+  color: #67d4c1;
+  font-weight: 700;
+}
+
 /* The visualization itself: a tall SVG you scroll through. */
 .workflow__viz {
   max-width: 720px;
@@ -444,6 +449,42 @@ strong {
   font-size: 15px;
   font-weight: 400;
   fill: var(--wf-ink-soft);
+}
+
+/* Discrete per-step toggles for the proposed workflow. */
+.tl-toggle {
+  cursor: pointer;
+  transition: opacity 0.4s ease;
+}
+
+.tl-toggle__ring {
+  fill: var(--wf-bg);
+  stroke-width: 1.5;
+  opacity: 0.55;
+  transition: opacity 0.25s ease, stroke-width 0.25s ease;
+}
+
+.tl-toggle__chevron {
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.8;
+}
+
+.tl-toggle:hover .tl-toggle__ring,
+.tl-toggle:focus-visible .tl-toggle__ring {
+  opacity: 1;
+  stroke-width: 2.5;
+}
+
+.tl-toggle:focus-visible {
+  outline: none;
+}
+
+.tl-toggle.is-on .tl-toggle__ring {
+  opacity: 0.9;
+  fill: var(--wf-bg);
 }
 
 /* Inline phase titles. */

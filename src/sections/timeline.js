@@ -4,8 +4,12 @@ import { timelinePhases } from "../data/placeholder.js";
 //
 // One continuous winding "snake" made of three connected phases, each in its
 // own color. The path draws in as you scroll, and nodes pop in as the drawn
-// length reaches them. The middle (handoff) phase contains a `proposed` step
-// that expands into place once that phase enters view.
+// length reaches them.
+//
+// The PROPOSED workflow adds extra nodes (flagged `proposed`). They are hidden
+// by default; each has its own discrete toggle (a small chevron) at its spot in
+// the snake. Clicking a toggle reveals just that node and the snake stretches to
+// make room; clicking again hides it.
 
 const svgNS = "http://www.w3.org/2000/svg";
 
@@ -24,7 +28,6 @@ const X_RIGHT = 570;
 // How far node labels sit from their node, measured outward toward the margin.
 const LABEL_OFFSET = 34;
 // How far phase titles (phases 2 & 3) sit outside the snake band edge.
-// Measured from the band, not the node, so the text block can't creep into the line.
 const TITLE_BAND_GAP = 20;
 
 function lerp(a, b, t) {
@@ -68,8 +71,7 @@ export function initTimeline() {
   const section = document.getElementById("timeline");
   if (!sticky || !section) return;
 
-  // Flatten phases into an ordered list of nodes, alternating x to make the
-  // snake wind left/right down the canvas.
+  // Flatten phases into an ordered list of nodes.
   const nodes = [];
   timelinePhases.forEach((phase, phaseIndex) => {
     phase.steps.forEach((step) => {
@@ -77,18 +79,26 @@ export function initTimeline() {
     });
   });
 
-  // Assign positions. Each node gets a row; x alternates between left/right.
-  // We compute two layouts: "current" (proposed steps collapsed onto their
-  // predecessor and hidden) and "proposed" (proposed steps occupy their own
-  // row, pushing everything below them down).
-  function layout(includeProposed) {
+  // Which proposed nodes are currently toggled ON.
+  const enabled = new Set();
+
+  // Compute layout for a given set of enabled proposed nodes. Proposed nodes
+  // that are OFF collapse onto the previous visible row (so they take no space);
+  // ON proposed nodes occupy their own row and push everything below them down.
+  function layoutFor(enabledSet) {
     const placed = [];
     let row = 0;
     nodes.forEach((node) => {
-      if (node.proposed && !includeProposed) {
-        // Collapse onto the previous node's position (hidden).
+      const hidden = node.proposed && !enabledSet.has(node.id);
+      if (hidden) {
         const prev = placed[placed.length - 1];
-        placed.push({ node, x: prev.x, y: prev.y, row: prev.row, collapsed: true });
+        placed.push({
+          node,
+          x: prev ? prev.x : X_LEFT,
+          y: prev ? prev.y : TOP_PAD,
+          row: prev ? prev.row : 0,
+          collapsed: true,
+        });
         return;
       }
       const x = row % 2 === 0 ? X_LEFT : X_RIGHT;
@@ -97,14 +107,18 @@ export function initTimeline() {
       row++;
     });
     const totalRows = row;
-    const height = TOP_PAD + (totalRows - 1) * NODE_GAP + BOTTOM_PAD;
+    const height = TOP_PAD + Math.max(0, totalRows - 1) * NODE_GAP + BOTTOM_PAD;
     return { placed, height };
   }
 
-  const layoutCurrent = layout(false);
-  const layoutProposed = layout(true);
-  // The SVG must be tall enough for the larger (proposed) layout.
-  const VIEW_H = layoutProposed.height;
+  // The SVG must be tall enough for the largest layout (everything enabled).
+  const allEnabled = new Set(nodes.filter((n) => n.proposed).map((n) => n.id));
+  const maxLayout = layoutFor(allEnabled);
+  const VIEW_H = maxLayout.height;
+
+  // Current and target positions per node (for animating toggles).
+  let current = layoutFor(enabled).placed.map((p) => ({ x: p.x, y: p.y, collapsed: p.collapsed }));
+  let target = current.map((p) => ({ ...p }));
 
   // SVG setup. It is tall; the section scrolls through it.
   const svg = document.createElementNS(svgNS, "svg");
@@ -112,7 +126,6 @@ export function initTimeline() {
   svg.setAttribute("preserveAspectRatio", "xMidYMin meet");
   svg.setAttribute("class", "tl-svg");
 
-  // Two layers: paths/titles beneath, nodes on top.
   const layerPaths = document.createElementNS(svgNS, "g");
   const layerNodes = document.createElementNS(svgNS, "g");
   svg.append(layerPaths, layerNodes);
@@ -130,7 +143,6 @@ export function initTimeline() {
     label.setAttribute("class", "tl-node__label");
     label.textContent = node.label;
 
-    // Detail can be long; wrap it into tspans so it never overflows.
     const detail = document.createElementNS(svgNS, "text");
     detail.setAttribute("class", "tl-node__detail");
     const detailLines = wrapText(node.detail, 34);
@@ -147,7 +159,53 @@ export function initTimeline() {
     return { g, circle, label, detail, detailSpans, node };
   });
 
-  // Phase title labels (inline, near the first node of each phase).
+  // Toggle markers: one per proposed node. A discrete chevron sitting on the
+  // snake that the user clicks to reveal/hide that proposed step.
+  const toggleEls = nodes
+    .map((node, i) => ({ node, i }))
+    .filter(({ node }) => node.proposed)
+    .map(({ node, i }) => {
+      const g = document.createElementNS(svgNS, "g");
+      g.setAttribute("class", "tl-toggle");
+      g.setAttribute("role", "button");
+      g.setAttribute("tabindex", "0");
+      g.setAttribute("aria-label", `Toggle proposed step: ${node.label}`);
+
+      // Hit area (invisible, generous) for easy clicking.
+      const hit = document.createElementNS(svgNS, "circle");
+      hit.setAttribute("r", "16");
+      hit.setAttribute("fill", "transparent");
+
+      // Small ring + chevron so it's discoverable but discrete.
+      const ring = document.createElementNS(svgNS, "circle");
+      ring.setAttribute("r", "11");
+      ring.setAttribute("class", "tl-toggle__ring");
+      ring.setAttribute("stroke", node.phase.color);
+
+      const chevron = document.createElementNS(svgNS, "path");
+      chevron.setAttribute("class", "tl-toggle__chevron");
+      chevron.setAttribute("stroke", node.phase.color);
+
+      g.append(hit, ring, chevron);
+      layerNodes.appendChild(g);
+
+      const toggle = () => {
+        if (enabled.has(node.id)) enabled.delete(node.id);
+        else enabled.add(node.id);
+        animateToLayout();
+      };
+      g.addEventListener("click", toggle);
+      g.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          toggle();
+        }
+      });
+
+      return { g, ring, chevron, node, index: i };
+    });
+
+  // Phase title labels.
   const phaseTitleEls = timelinePhases.map((phase) => {
     const g = document.createElementNS(svgNS, "g");
     g.setAttribute("class", "tl-phase-title");
@@ -175,91 +233,116 @@ export function initTimeline() {
 
   sticky.appendChild(svg);
 
-  // morph 0 -> current layout, 1 -> proposed layout. reveal 0..1 = draw-in.
-  let morph = 0;
   let reveal = 0;
 
-  // Pre-create per-phase path elements (bg + fg) on top of node layer order.
+  // Per-phase path elements (bg track + fg draw-in).
   const pathEls = timelinePhases.map((phase) => {
     const bg = document.createElementNS(svgNS, "path");
     bg.setAttribute("class", "tl-path-bg");
     const fg = document.createElementNS(svgNS, "path");
     fg.setAttribute("class", "tl-path-fg");
     fg.setAttribute("stroke", phase.color);
-    // Insert paths beneath nodes.
     layerPaths.append(bg, fg);
     return { bg, fg, phase };
   });
 
-  // Build the full ordered point list at a given morph, plus per-phase point
-  // groups so we can color each phase separately. Phases connect because the
-  // first point of a phase equals the last drawn point of the previous one.
-  function computePoints(m) {
-    const pts = nodeEls.map(({ node }, i) => {
-      const c = layoutCurrent.placed[i];
-      const p = layoutProposed.placed[i];
-      return {
-        x: lerp(c.x, p.x, m),
-        y: lerp(c.y, p.y, m),
-        node,
-        collapsed: c.collapsed && p.collapsed,
-      };
-    });
-    return pts;
+  // For a collapsed (hidden) proposed node, find where its toggle marker should
+  // sit: midway between the previous visible node and the next visible node.
+  function markerPosition(i, positions) {
+    // previous visible node (any earlier node that isn't a collapsed proposed)
+    let prevK = -1;
+    for (let k = i - 1; k >= 0; k--) {
+      if (!positions[k].collapsed) {
+        prevK = k;
+        break;
+      }
+    }
+    // next visible node
+    let nextK = -1;
+    for (let k = i + 1; k < positions.length; k++) {
+      if (!positions[k].collapsed) {
+        nextK = k;
+        break;
+      }
+    }
+    const prev = prevK >= 0 ? positions[prevK] : null;
+    const next = nextK >= 0 ? positions[nextK] : null;
+
+    // If several collapsed markers share this same gap, distribute them evenly
+    // along the segment so they don't stack on top of one another.
+    const lo = prevK; // exclusive lower bound
+    const hi = nextK >= 0 ? nextK : positions.length; // exclusive upper bound
+    const siblings = [];
+    for (let k = lo + 1; k < hi; k++) {
+      if (positions[k].collapsed) siblings.push(k);
+    }
+    const order = Math.max(0, siblings.indexOf(i));
+    const count = Math.max(1, siblings.length);
+    // Fraction from prev->next: spread markers at (order+1)/(count+1).
+    const f = (order + 1) / (count + 1);
+
+    if (prev && next) {
+      return { x: lerp(prev.x, next.x, f), y: lerp(prev.y, next.y, f) };
+    }
+    if (prev) return { x: prev.x, y: prev.y + NODE_GAP * f };
+    if (next) return { x: next.x, y: next.y - NODE_GAP * (1 - f) };
+    return { x: X_LEFT, y: TOP_PAD };
   }
 
   function render() {
-    const pts = computePoints(morph);
-    const totalHeight = VIEW_H;
+    const positions = current;
 
     // Group points by phase, chaining the boundary point so segments connect.
+    // Collapsed (hidden) proposed nodes are skipped from the path.
     let cursor = 0;
     timelinePhases.forEach((phase, pi) => {
       const count = phase.steps.length;
-      const slice = pts.slice(cursor, cursor + count);
+      const sliceIdx = [];
+      for (let k = 0; k < count; k++) sliceIdx.push(cursor + k);
       cursor += count;
 
-      // Connect to previous phase's last point for continuity.
-      const connectPts =
-        pi > 0 ? [pts[cursor - count - 1], ...slice] : slice;
+      // Visible points for this phase.
+      const visibleIdx = sliceIdx.filter((k) => !positions[k].collapsed);
+      // Connect to the previous phase's last visible point.
+      let connectIdx = visibleIdx;
+      if (pi > 0) {
+        for (let k = cursor - count - 1; k >= 0; k--) {
+          if (!positions[k].collapsed) {
+            connectIdx = [k, ...visibleIdx];
+            break;
+          }
+        }
+      }
+      const connectPts = connectIdx.map((k) => ({ x: positions[k].x, y: positions[k].y }));
 
-      const d = buildPath(connectPts.map((p) => ({ x: p.x, y: p.y })));
+      const d = buildPath(connectPts);
       const { bg, fg } = pathEls[pi];
       bg.setAttribute("d", d);
       fg.setAttribute("d", d);
 
-      // Draw-in per phase based on overall reveal mapped to this phase's band.
       const len = fg.getTotalLength ? fg.getTotalLength() : 0;
       const phaseStart = pi / timelinePhases.length;
       const phaseEnd = (pi + 1) / timelinePhases.length;
-      const local = Math.max(
-        0,
-        Math.min(1, (reveal - phaseStart) / (phaseEnd - phaseStart))
-      );
+      const local = Math.max(0, Math.min(1, (reveal - phaseStart) / (phaseEnd - phaseStart)));
       fg.style.strokeDasharray = `${len}`;
       fg.style.strokeDashoffset = `${len * (1 - local)}`;
     });
 
+    const drawableH = VIEW_H - TOP_PAD - BOTTOM_PAD;
+
     // Position + reveal nodes.
     nodeEls.forEach((el, i) => {
-      const p = pts[i];
+      const p = positions[i];
       el.g.setAttribute("transform", `translate(${p.x}, ${p.y})`);
 
-      const tY = (p.y - TOP_PAD) / (VIEW_H - TOP_PAD - BOTTOM_PAD);
+      const tY = (p.y - TOP_PAD) / drawableH;
       const reached = reveal >= tY - 0.02;
+      const hiddenProposed = el.node.proposed && p.collapsed;
 
-      if (el.node.proposed) {
-        const grow = Math.min(1, morph * 1.4);
-        el.circle.setAttribute("r", `${lerp(0, 16, grow)}`);
-        el.g.style.opacity = String((reached ? 1 : 0.12) * grow);
-      } else {
-        el.g.style.opacity = reached ? "1" : "0.12";
-      }
+      // A collapsed proposed node is invisible (its toggle marker stands in).
+      el.g.style.display = hiddenProposed ? "none" : "";
+      el.g.style.opacity = hiddenProposed ? "0" : reached ? "1" : "0.12";
 
-      // Place the label on the OUTER side of the node (left-column nodes get
-      // left-aligned text in the left margin; right-column nodes get
-      // right-aligned text in the right margin). This keeps all text clear of
-      // the central winding zone where the snake curves.
       const onRight = p.x >= (X_LEFT + X_RIGHT) / 2;
       const dx = onRight ? LABEL_OFFSET : -LABEL_OFFSET;
       const anchor = onRight ? "start" : "end";
@@ -268,22 +351,50 @@ export function initTimeline() {
       el.label.setAttribute("text-anchor", anchor);
       el.detail.setAttribute("y", 12);
       el.detail.setAttribute("text-anchor", anchor);
-      // Each wrapped line must reset its own x to align with the label.
       el.detailSpans.forEach((tspan) => tspan.setAttribute("x", dx));
     });
 
-    // Phase titles: placed in the side margin OPPOSITE the phase's first node,
-    // so they sit well clear of the central winding band and never overlap the
-    // connecting line.
+    // Position toggle markers + set their open/closed visual state.
+    toggleEls.forEach((t) => {
+      const isOn = enabled.has(t.node.id);
+      const p = positions[t.index];
+      // When ON, sit on the node; when OFF, sit at the insertion midpoint.
+      const pos = isOn ? { x: p.x, y: p.y } : markerPosition(t.index, positions);
+
+      // Offset the marker slightly off the node so it doesn't cover it when on.
+      const onRight = pos.x >= (X_LEFT + X_RIGHT) / 2;
+      const ox = isOn ? (onRight ? -26 : 26) : 0;
+      t.g.setAttribute("transform", `translate(${pos.x + ox}, ${pos.y})`);
+
+      // Chevron: down (v) when closed (click to expand), up (^) when open.
+      t.chevron.setAttribute(
+        "d",
+        isOn ? "M -5 3 L 0 -3 L 5 3" : "M -5 -3 L 0 3 L 5 -3"
+      );
+      t.g.classList.toggle("is-on", isOn);
+
+      // Hide the marker entirely until its part of the snake has been revealed.
+      const tY = (pos.y - TOP_PAD) / drawableH;
+      const reached = reveal >= tY - 0.02;
+      t.g.style.opacity = reached ? "1" : "0";
+      t.g.style.pointerEvents = reached ? "auto" : "none";
+    });
+
+    // Phase titles.
     let idx = 0;
     phaseTitleEls.forEach((pt, pi) => {
-      const firstPoint = pts[idx];
-      idx += timelinePhases[pi].steps.length;
+      // First *visible* node of this phase.
+      let firstK = idx;
+      const phaseCount = timelinePhases[pi].steps.length;
+      for (let k = idx; k < idx + phaseCount; k++) {
+        if (!positions[k].collapsed) {
+          firstK = k;
+          break;
+        }
+      }
+      idx += phaseCount;
+      const firstPoint = positions[firstK];
 
-      // First node on the left -> title in the right margin, and vice versa.
-      // Pre-handoff: 15px out from its first node (looks good as-is).
-      // Other phases: anchor outside the band edge so the text block can't
-      // overlap the winding line no matter how long the title wraps.
       const firstOnRight = firstPoint.x >= (X_LEFT + X_RIGHT) / 2;
       const anchor = firstOnRight ? "end" : "start";
       let x;
@@ -293,7 +404,6 @@ export function initTimeline() {
       } else {
         x = firstOnRight ? X_LEFT - TITLE_BAND_GAP : X_RIGHT + TITLE_BAND_GAP;
       }
-      // Lift the title block higher when it wraps to more lines.
       const titleHeight = pt.titleLineCount * 23;
       const y = firstPoint.y - 24 - titleHeight;
 
@@ -311,28 +421,53 @@ export function initTimeline() {
     });
   }
 
+  // Animate node positions toward the layout for the current `enabled` set.
+  let raf = null;
+  function animateToLayout() {
+    target = layoutFor(enabled).placed.map((p) => ({ x: p.x, y: p.y, collapsed: p.collapsed }));
+
+    // Snap collapsed flags immediately for nodes that just turned ON so they
+    // animate in from their predecessor; keep them collapsed-hidden when OFF.
+    const start = current.map((p) => ({ ...p }));
+    // Starting position for a node newly turning on: its predecessor's spot.
+    target.forEach((t, i) => {
+      if (!t.collapsed && start[i].collapsed) {
+        // begin the animation from where the collapsed marker was
+        const m = markerPosition(i, start);
+        start[i] = { x: m.x, y: m.y, collapsed: false };
+      }
+    });
+
+    cancelAnimationFrame(raf);
+    const t0 = performance.now();
+    const dur = 520;
+    const ease = (x) => 1 - Math.pow(1 - x, 3);
+
+    function tick(now) {
+      const k = Math.min(1, (now - t0) / dur);
+      const e = ease(k);
+      current = target.map((t, i) => ({
+        x: lerp(start[i].x, t.x, e),
+        y: lerp(start[i].y, t.y, e),
+        // Reveal as soon as we start (so it animates), hide only when fully off.
+        collapsed: t.collapsed,
+      }));
+      render();
+      if (k < 1) raf = requestAnimationFrame(tick);
+    }
+    raf = requestAnimationFrame(tick);
+  }
+
   render();
 
-  // Drive `reveal` and `morph` from scroll progress through the section.
+  // Drive `reveal` from scroll progress through the section.
   function onScroll() {
     const rect = section.getBoundingClientRect();
     const vh = window.innerHeight;
-    // Progress: 0 when section top hits viewport top, 1 when bottom reaches
-    // viewport bottom. Tuned so the draw-in spans most of the scroll.
     const total = rect.height - vh;
     const scrolled = Math.min(Math.max(-rect.top, 0), Math.max(total, 1));
     const progress = total > 0 ? scrolled / total : 0;
-
     reveal = Math.min(1, progress * 1.05);
-
-    // Start morphing the proposed step in once the middle phase is reaching.
-    const morphStart = 0.34;
-    const morphEnd = 0.5;
-    morph = Math.min(
-      1,
-      Math.max(0, (progress - morphStart) / (morphEnd - morphStart))
-    );
-
     render();
   }
 

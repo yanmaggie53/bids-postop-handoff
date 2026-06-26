@@ -41,8 +41,9 @@ export const flyers = [
 // winding "snake" of its own color; together they flow into one continuous
 // path. Nodes within a phase appear in order.
 //
-// Steps flagged `proposed: true` only appear once the proposed-workflow
-// animation is triggered; they are inserted into the middle (handoff) phase.
+// Steps flagged `proposed: true` belong to the PROPOSED workflow. They are
+// hidden by default and each one has its own discrete toggle at its location
+// in the snake, so the viewer can reveal them individually.
 export const timelinePhases = [
   {
     id: "pre-handoff",
@@ -56,6 +57,13 @@ export const timelinePhases = [
       { id: "confirm-bed", label: "Confirm ICU bed", detail: "Anesthesia team calls ICU to confirm bed availability." },
       { id: "family-update", label: "Family update", detail: "Circulating nurse updates the family about the transfer." },
       { id: "icu-update", label: "Update ICU", detail: "Anesthesia team again calls the ICU to update about the transfer." },
+      {
+        id: "icu-preview",
+        label: "ICU preview",
+        detail:
+          "ICU clinicians prepare for patient arrival by reviewing patient information in advance using the handoff report tool on Epic.",
+        proposed: true,
+      },
     ],
   },
   {
@@ -81,6 +89,13 @@ export const timelinePhases = [
           "Surgical representative: surgical procedure, findings, special instructions, complications, labs, imaging, diet and concerns.",
       },
       {
+        id: "anesthesia-epic-ref",
+        label: "Reference handoff tool",
+        detail:
+          "While giving the verbal handoff, the anesthesia rep references the handoff report tool in Epic \u2014 not to dictate the handoff, but to help in case they forget something or need to answer an ICU clinician's question.",
+        proposed: true,
+      },
+      {
         id: "anesthesia-report",
         label: "Anesthesia rep",
         detail:
@@ -94,6 +109,13 @@ export const timelinePhases = [
     where: "In the ICU",
     color: "#f78fb3", // pink
     steps: [
+      {
+        id: "icu-review",
+        label: "ICU review",
+        detail:
+          "ICU clinicians use the handoff report tool in Epic to review and/or clarify patient information.",
+        proposed: true,
+      },
       { id: "continue-setup", label: "Continue setup", detail: "ICU clinicians (RNs) continue patient setup (draping, cleaning, etc.)." },
       { id: "orders", label: "Orders", detail: "ICU APPs order tests and medications for the patient." },
       { id: "care-plan", label: "Care plan", detail: "ICU APPs discuss the care plan with critical care residents/physicians and implement it." },
