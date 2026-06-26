@@ -50,37 +50,54 @@ export const timelinePhases = [
     where: "In the OR",
     color: "#67d4c1", // teal
     steps: [
-      { id: "surgery-ends", label: "Surgery ends", detail: "Procedure completed; emergence begins." },
-      { id: "prep", label: "Patient prep", detail: "Lines, drips, and monitors readied for transfer." },
-      { id: "or-summary", label: "OR debrief", detail: "Team confirms counts and intra-op events." },
+      { id: "incision-closed", label: "Surgery finished", detail: "Incision closed & surgery is finished." },
+      { id: "or-debrief", label: "OR debrief", detail: "Debrief in the OR." },
+      { id: "prep-transfer", label: "Prep for transfer", detail: "Preparation of patient for ICU transfer." },
+      { id: "confirm-bed", label: "Confirm ICU bed", detail: "Anesthesia team calls ICU to confirm bed availability." },
+      { id: "family-update", label: "Family update", detail: "Circulating nurse updates the family about the transfer." },
+      { id: "icu-update", label: "Update ICU", detail: "Anesthesia team again calls the ICU to update about the transfer." },
     ],
   },
   {
     id: "handoff",
-    title: "Postoperative Handoff",
-    where: "ICU \u2014 between the OR & ICU teams",
+    title: "Handoff Process",
+    where: "In the ICU \u2014 between the OR & ICU teams",
     color: "#ffd166", // amber
     steps: [
-      { id: "transport", label: "Transport", detail: "Patient moved from OR to ICU." },
-      { id: "icu-connect", label: "ICU connect", detail: "Patient connected to ICU monitors and lines." },
+      { id: "icu-setup", label: "Patient setup", detail: "Patient setup in ICU." },
+      { id: "team-gather", label: "Team gathers", detail: "ICU clinicians (APPs, RNs and residents) gather for handoff." },
+      { id: "eicu", label: "eICU connected", detail: "eICU is connected." },
+      { id: "verbal-start", label: "Verbal handoff", detail: "Verbal handoff starts." },
       {
-        id: "structured-handoff",
-        label: "Structured handoff",
-        detail: "Brief, standardized handoff using the Epic tool.",
-        proposed: true,
+        id: "nurse-report",
+        label: "Circulating nurse",
+        detail:
+          "Circulating nurse initiates handoff transfer: confirms patient's name and age, allergies, medications and implants, specimens, incisions and dressing, family update.",
       },
-      { id: "verbal-report", label: "Verbal report", detail: "OR team delivers the handoff report." },
+      {
+        id: "surgical-report",
+        label: "Surgical rep",
+        detail:
+          "Surgical representative: surgical procedure, findings, special instructions, complications, labs, imaging, diet and concerns.",
+      },
+      {
+        id: "anesthesia-report",
+        label: "Anesthesia rep",
+        detail:
+          "Anesthesia representative: type of anesthesia, allergies, isolation, airway, ventilation, hemodynamics, fluids, blood products, anesthesia complications, PMH, concerns.",
+      },
     ],
   },
   {
     id: "post-handoff",
     title: "Post-Handoff Process",
-    where: "ICU team takes over",
+    where: "In the ICU",
     color: "#f78fb3", // pink
     steps: [
-      { id: "questions", label: "Q&A", detail: "ICU team asks clarifying questions." },
-      { id: "plan", label: "Care plan", detail: "ICU sets the initial post-op plan." },
-      { id: "stabilize", label: "Stabilize", detail: "Ongoing ICU monitoring and care." },
+      { id: "continue-setup", label: "Continue setup", detail: "ICU clinicians (RNs) continue patient setup (draping, cleaning, etc.)." },
+      { id: "orders", label: "Orders", detail: "ICU APPs order tests and medications for the patient." },
+      { id: "care-plan", label: "Care plan", detail: "ICU APPs discuss the care plan with critical care residents/physicians and implement it." },
+      { id: "follow-up", label: "Follow-up", detail: "ICU APPs might reach out to OR clinicians (residents \u2014 surgeons / anesthesia) with any questions." },
     ],
   },
 ];

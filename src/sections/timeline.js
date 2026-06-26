@@ -9,17 +9,36 @@ import { timelinePhases } from "../data/placeholder.js";
 
 const svgNS = "http://www.w3.org/2000/svg";
 
-const VIEW_W = 600;
-// Vertical space allotted to each node along the snake.
-const NODE_GAP = 230;
-const TOP_PAD = 120;
-const BOTTOM_PAD = 140;
+const VIEW_W = 640;
+// Vertical space allotted to each node along the snake. Generous because some
+// node details wrap to several lines.
+const NODE_GAP = 280;
+const TOP_PAD = 130;
+const BOTTOM_PAD = 160;
 // Horizontal extremes of the winding path.
-const X_LEFT = 150;
-const X_RIGHT = 450;
+const X_LEFT = 170;
+const X_RIGHT = 470;
 
 function lerp(a, b, t) {
   return a + (b - a) * t;
+}
+
+// Greedily wrap a string into lines of at most `maxChars` characters.
+function wrapText(text, maxChars) {
+  const words = text.split(/\s+/);
+  const lines = [];
+  let line = "";
+  words.forEach((word) => {
+    const candidate = line ? `${line} ${word}` : word;
+    if (candidate.length > maxChars && line) {
+      lines.push(line);
+      line = word;
+    } else {
+      line = candidate;
+    }
+  });
+  if (line) lines.push(line);
+  return lines;
 }
 
 // Build a smooth winding path through a list of {x, y} points using cubic
@@ -103,13 +122,21 @@ export function initTimeline() {
     label.setAttribute("class", "tl-node__label");
     label.textContent = node.label;
 
+    // Detail can be long; wrap it into tspans so it never overflows.
     const detail = document.createElementNS(svgNS, "text");
     detail.setAttribute("class", "tl-node__detail");
-    detail.textContent = node.detail;
+    const detailLines = wrapText(node.detail, 34);
+    const detailSpans = detailLines.map((lineText, li) => {
+      const tspan = document.createElementNS(svgNS, "tspan");
+      tspan.textContent = lineText;
+      tspan.setAttribute("dy", li === 0 ? "0" : "1.25em");
+      detail.appendChild(tspan);
+      return tspan;
+    });
 
     g.append(circle, label, detail);
     layerNodes.appendChild(g);
-    return { g, circle, label, detail, node };
+    return { g, circle, label, detail, detailSpans, node };
   });
 
   // Phase title labels (inline, near the first node of each phase).
@@ -219,11 +246,12 @@ export function initTimeline() {
       const dx = onRight ? -26 : 26;
       const anchor = onRight ? "end" : "start";
       el.label.setAttribute("x", dx);
-      el.label.setAttribute("y", -4);
+      el.label.setAttribute("y", -8);
       el.label.setAttribute("text-anchor", anchor);
-      el.detail.setAttribute("x", dx);
-      el.detail.setAttribute("y", 16);
+      el.detail.setAttribute("y", 12);
       el.detail.setAttribute("text-anchor", anchor);
+      // Each wrapped line must reset its own x to align under the label.
+      el.detailSpans.forEach((tspan) => tspan.setAttribute("x", dx));
     });
 
     // Phase titles near each phase's first node.
