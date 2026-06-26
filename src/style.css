@@ -7,10 +7,17 @@
   --navy: #1f3a5f;
   --accent: #d1495b;
   --accent-2: #2a9d8f;
-  --max-prose: 40rem;
+  --max-prose: 42rem;
 
   --font-display: "Archivo", "Archivo Black", system-ui, sans-serif;
   --font-body: "Lora", Georgia, "Times New Roman", serif;
+
+  /* Type scale — desktop defaults */
+  --text-body: 1.4rem;
+  --text-kicker: 0.9rem;
+  --text-lead: 1.65rem;
+  --text-note: 1.15rem;
+  --text-caption: 1.2rem;
 }
 
 * {
@@ -26,7 +33,7 @@ body {
   background: var(--paper);
   color: var(--ink);
   font-family: var(--font-body);
-  font-size: 1.25rem;
+  font-size: var(--text-body);
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -141,14 +148,14 @@ strong {
   font-family: var(--font-display);
   text-transform: uppercase;
   letter-spacing: 0.2em;
-  font-size: 0.8rem;
+  font-size: var(--text-kicker);
   font-weight: 600;
   color: var(--accent);
   margin: 0 0 1.5rem !important;
 }
 
 .prose__lead {
-  font-size: 1.5rem;
+  font-size: var(--text-lead);
   line-height: 1.5;
   color: var(--navy);
   font-weight: 500;
@@ -164,7 +171,7 @@ strong {
 }
 
 .prose__note {
-  font-size: 1rem;
+  font-size: var(--text-note);
   color: var(--ink-soft);
   border-left: 3px solid var(--line);
   padding-left: 1rem;
@@ -255,7 +262,7 @@ strong {
 .screenshots__caption {
   max-width: 38rem;
   text-align: center;
-  font-size: 1.05rem;
+  font-size: var(--text-caption);
   color: var(--ink-soft);
   min-height: 3.4rem;
 }
@@ -367,7 +374,7 @@ strong {
   font-family: var(--font-display);
   text-transform: uppercase;
   letter-spacing: 0.2em;
-  font-size: 0.8rem;
+  font-size: var(--text-kicker);
   font-weight: 600;
   color: #67d4c1;
   margin: 0 0 1rem;
@@ -381,7 +388,7 @@ strong {
 
 .workflow__intro {
   color: var(--wf-ink-soft);
-  font-size: 1.1rem;
+  font-size: var(--text-body);
   margin: 0;
 }
 
@@ -427,14 +434,14 @@ strong {
 
 .tl-node__label {
   font-family: var(--font-display);
-  font-size: 17px;
+  font-size: 20px;
   font-weight: 600;
   fill: var(--wf-ink);
 }
 
 .tl-node__detail {
   font-family: var(--font-body);
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 400;
   fill: var(--wf-ink-soft);
 }
@@ -442,7 +449,7 @@ strong {
 /* Inline phase titles. */
 .tl-phase-title__name {
   font-family: var(--font-display);
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -451,7 +458,7 @@ strong {
 .tl-phase-title__where {
   font-family: var(--font-body);
   font-style: italic;
-  font-size: 13px;
+  font-size: 15px;
   fill: var(--wf-ink-soft);
 }
 
@@ -475,7 +482,7 @@ strong {
   color: var(--ink-soft);
   margin: 0 auto 1.5rem;
   max-width: 34rem;
-  font-size: 1.1rem;
+  font-size: var(--text-body);
 }
 
 .bubble-block__chart {
@@ -523,7 +530,7 @@ strong {
 /* ---------- SOURCES ---------- */
 .sources__list {
   padding-left: 1.25rem;
-  font-size: 1.05rem;
+  font-size: var(--text-caption);
   color: var(--ink-soft);
 }
 
@@ -541,22 +548,44 @@ strong {
   text-align: center;
 }
 
-/* ---------- RESPONSIVE ---------- */
+/* ---------- RESPONSIVE (mobile) ---------- */
 @media (max-width: 720px) {
-  body {
-    font-size: 1.1rem;
+  :root {
+    --text-body: 1.15rem;
+    --text-kicker: 0.82rem;
+    --text-lead: 1.35rem;
+    --text-note: 1.05rem;
+    --text-caption: 1.05rem;
   }
 
   .workflow {
     padding: 4rem 1rem 3rem;
   }
 
+  .workflow__viz {
+    max-width: 100%;
+  }
+
+  /* SVG text scales with the graphic; keep readable but not oversized. */
   .tl-node__label {
-    font-size: 19px;
+    font-size: 16px;
   }
 
   .tl-node__detail {
-    font-size: 14px;
+    font-size: 13px;
+  }
+
+  .tl-phase-title__name {
+    font-size: 18px;
+  }
+
+  .tl-phase-title__where {
+    font-size: 13px;
+  }
+
+  .flyers__item {
+    flex: 0 1 100%;
+    max-width: 360px;
   }
 }
 
