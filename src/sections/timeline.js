@@ -9,15 +9,23 @@ import { timelinePhases } from "../data/placeholder.js";
 
 const svgNS = "http://www.w3.org/2000/svg";
 
-const VIEW_W = 640;
+// The viewBox is wide so labels have room on the OUTER sides of the snake,
+// away from the central winding zone.
+const VIEW_W = 900;
 // Vertical space allotted to each node along the snake. Generous because some
 // node details wrap to several lines.
 const NODE_GAP = 280;
 const TOP_PAD = 130;
 const BOTTOM_PAD = 160;
-// Horizontal extremes of the winding path.
-const X_LEFT = 170;
-const X_RIGHT = 470;
+// Horizontal extremes of the winding path. Kept near the center so the snake
+// occupies a narrow middle band, leaving wide margins for text on both sides.
+const X_LEFT = 330;
+const X_RIGHT = 570;
+// How far node labels sit from their node, measured outward toward the margin.
+const LABEL_OFFSET = 34;
+// How far phase titles (phases 2 & 3) sit outside the snake band edge.
+// Measured from the band, not the node, so the text block can't creep into the line.
+const TITLE_BAND_GAP = 20;
 
 function lerp(a, b, t) {
   return a + (b - a) * t;
@@ -147,7 +155,14 @@ export function initTimeline() {
     const title = document.createElementNS(svgNS, "text");
     title.setAttribute("class", "tl-phase-title__name");
     title.setAttribute("fill", phase.color);
-    title.textContent = phase.title;
+    const titleLines = wrapText(phase.title, 16);
+    const titleSpans = titleLines.map((lineText, li) => {
+      const tspan = document.createElementNS(svgNS, "tspan");
+      tspan.textContent = lineText;
+      tspan.setAttribute("dy", li === 0 ? "0" : "1.15em");
+      title.appendChild(tspan);
+      return tspan;
+    });
 
     const where = document.createElementNS(svgNS, "text");
     where.setAttribute("class", "tl-phase-title__where");
@@ -155,7 +170,7 @@ export function initTimeline() {
 
     g.append(title, where);
     layerPaths.appendChild(g);
-    return { g, title, where, phase };
+    return { g, title, titleSpans, where, titleLineCount: titleLines.length, phase };
   });
 
   sticky.appendChild(svg);
@@ -241,29 +256,55 @@ export function initTimeline() {
         el.g.style.opacity = reached ? "1" : "0.12";
       }
 
-      // Place label opposite the bend direction so it doesn't overlap the path.
+      // Place the label on the OUTER side of the node (left-column nodes get
+      // left-aligned text in the left margin; right-column nodes get
+      // right-aligned text in the right margin). This keeps all text clear of
+      // the central winding zone where the snake curves.
       const onRight = p.x >= (X_LEFT + X_RIGHT) / 2;
-      const dx = onRight ? -26 : 26;
-      const anchor = onRight ? "end" : "start";
+      const dx = onRight ? LABEL_OFFSET : -LABEL_OFFSET;
+      const anchor = onRight ? "start" : "end";
       el.label.setAttribute("x", dx);
       el.label.setAttribute("y", -8);
       el.label.setAttribute("text-anchor", anchor);
       el.detail.setAttribute("y", 12);
       el.detail.setAttribute("text-anchor", anchor);
-      // Each wrapped line must reset its own x to align under the label.
+      // Each wrapped line must reset its own x to align with the label.
       el.detailSpans.forEach((tspan) => tspan.setAttribute("x", dx));
     });
 
-    // Phase titles near each phase's first node.
+    // Phase titles: placed in the side margin OPPOSITE the phase's first node,
+    // so they sit well clear of the central winding band and never overlap the
+    // connecting line.
     let idx = 0;
     phaseTitleEls.forEach((pt, pi) => {
       const firstPoint = pts[idx];
       idx += timelinePhases[pi].steps.length;
-      const x = 40;
-      const y = firstPoint.y - 70;
+
+      // First node on the left -> title in the right margin, and vice versa.
+      // Pre-handoff: 15px out from its first node (looks good as-is).
+      // Other phases: anchor outside the band edge so the text block can't
+      // overlap the winding line no matter how long the title wraps.
+      const firstOnRight = firstPoint.x >= (X_LEFT + X_RIGHT) / 2;
+      const anchor = firstOnRight ? "end" : "start";
+      let x;
+      if (pi === 0) {
+        const sign = firstOnRight ? -1 : 1;
+        x = firstPoint.x + sign * 15;
+      } else {
+        x = firstOnRight ? X_LEFT - TITLE_BAND_GAP : X_RIGHT + TITLE_BAND_GAP;
+      }
+      // Lift the title block higher when it wraps to more lines.
+      const titleHeight = pt.titleLineCount * 23;
+      const y = firstPoint.y - 24 - titleHeight;
+
       pt.g.setAttribute("transform", `translate(${x}, ${y})`);
+      pt.title.setAttribute("x", 0);
       pt.title.setAttribute("y", 0);
-      pt.where.setAttribute("y", 22);
+      pt.title.setAttribute("text-anchor", anchor);
+      pt.titleSpans.forEach((tspan) => tspan.setAttribute("x", 0));
+      pt.where.setAttribute("x", 0);
+      pt.where.setAttribute("y", titleHeight + 4);
+      pt.where.setAttribute("text-anchor", anchor);
 
       const phaseStart = pi / timelinePhases.length;
       pt.g.style.opacity = reveal >= phaseStart - 0.04 ? "1" : "0.12";

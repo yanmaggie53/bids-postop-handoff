@@ -60,7 +60,7 @@ export const timelinePhases = [
   },
   {
     id: "handoff",
-    title: "Handoff Process",
+    title: "Postoperative Handoff Process",
     where: "In the ICU \u2014 between the OR & ICU teams",
     color: "#ffd166", // amber
     steps: [
