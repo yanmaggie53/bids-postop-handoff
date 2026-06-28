@@ -165,72 +165,126 @@ export const timelinePhases = [
   },
 ];
 
-// Bubble chart data, one dataset per category.
+// Quick stats for the Findings section (replace with real study numbers).
+export const quickStats = {
+  observations: 24,
+  cliniciansTotal: 42,
+  cliniciansByRole: {
+    "ICU clinicians": 12,
+    Anesthesiologists: 8,
+    "Certified registered nurse anesthetists": 6,
+    "Student registered nurse anesthetists": 3,
+    "Circulating nurses": 7,
+    Surgeons: 6,
+  },
+  handoffsWithTool: 14,
+};
+
+// Bubble chart data — three overarching themes. Each theme has sub-themes;
+// clicking a sub-theme bubble reveals the individual codes beneath it.
 // `value` ~ how many clinicians voiced this (drives bubble size).
 export const bubbleCategories = [
   {
-    id: "challenges",
-    title: "Challenges",
-    blurb: "Friction points raised about the workflow or the tool.",
-    accent: "#d1495b",
-    items: [
-      { label: "Too rushed", value: 9 },
-      { label: "Tool not opened", value: 7 },
-      { label: "Hard to find", value: 5 },
-      { label: "Duplicate entry", value: 4 },
-      { label: "Interruptions", value: 6 },
-      { label: "Unclear ownership", value: 3 },
+    id: "usefulness",
+    title: "Perceived usefulness of the handoff report",
+    blurb: "Where the tool helps, and where clinicians see gaps.",
+    accent: "#2a9d8f",
+    subThemes: [
+      {
+        id: "standardization",
+        label: "Standardization & completeness",
+        codes: [
+          { label: "Standardized info", value: 8 },
+          { label: "Fewer omissions", value: 6 },
+          { label: "Shared reference", value: 5 },
+        ],
+      },
+      {
+        id: "efficiency",
+        label: "Efficiency & usability",
+        codes: [
+          { label: "Faster report", value: 4 },
+          { label: "Auto-populated", value: 7 },
+          { label: "Clean layout", value: 4 },
+        ],
+      },
+      {
+        id: "content-liked",
+        label: "Content clinicians valued",
+        codes: [
+          { label: "Surgery summary", value: 8 },
+          { label: "Med list", value: 6 },
+          { label: "Vitals snapshot", value: 5 },
+        ],
+      },
+      {
+        id: "content-disliked",
+        label: "Content frustrations",
+        codes: [
+          { label: "Too many fields", value: 7 },
+          { label: "Small text", value: 4 },
+          { label: "Free-text only", value: 3 },
+        ],
+      },
     ],
   },
   {
-    id: "usefulness",
-    title: "Usefulness",
-    blurb: "Where the tool genuinely helps the handoff.",
-    accent: "#2a9d8f",
-    items: [
-      { label: "Standardized info", value: 8 },
-      { label: "Fewer omissions", value: 6 },
-      { label: "Shared reference", value: 5 },
-      { label: "Faster report", value: 4 },
-      { label: "Auto-populated", value: 7 },
+    id: "challenges",
+    title: "Challenges",
+    blurb: "Friction in the workflow, the tool, and clinician behavior.",
+    accent: "#d1495b",
+    subThemes: [
+      {
+        id: "workflow",
+        label: "Workflow & timing",
+        codes: [
+          { label: "Too rushed", value: 9 },
+          { label: "Interruptions", value: 6 },
+          { label: "Unclear ownership", value: 3 },
+        ],
+      },
+      {
+        id: "tool-access",
+        label: "Tool access & adoption",
+        codes: [
+          { label: "Tool not opened", value: 7 },
+          { label: "Hard to find", value: 5 },
+          { label: "Buried button", value: 6 },
+        ],
+      },
+      {
+        id: "tool-burden",
+        label: "Tool burden",
+        codes: [
+          { label: "Duplicate entry", value: 4 },
+          { label: "Slow to load", value: 5 },
+        ],
+      },
     ],
   },
   {
     id: "suggestions",
-    title: "Suggestions",
-    blurb: "Ideas clinicians offered for improvement.",
+    title: "General suggestions",
+    blurb: "Ideas clinicians offered for improvement and implementation.",
     accent: "#e9a020",
-    items: [
-      { label: "Mobile access", value: 5 },
-      { label: "Shorter form", value: 7 },
-      { label: "Auto-reminder", value: 6 },
-      { label: "Prefill drips", value: 4 },
-      { label: "Quick template", value: 5 },
-    ],
-  },
-  {
-    id: "liked",
-    title: "Elements liked",
-    blurb: "Specific parts of the tool clinicians appreciated.",
-    accent: "#457b9d",
-    items: [
-      { label: "Surgery summary", value: 8 },
-      { label: "Med list", value: 6 },
-      { label: "Clean layout", value: 4 },
-      { label: "Vitals snapshot", value: 5 },
-    ],
-  },
-  {
-    id: "disliked",
-    title: "Elements disliked",
-    blurb: "Specific parts that frustrated clinicians.",
-    accent: "#8d5524",
-    items: [
-      { label: "Too many fields", value: 7 },
-      { label: "Small text", value: 4 },
-      { label: "Buried button", value: 6 },
-      { label: "Slow to load", value: 5 },
-      { label: "Free-text only", value: 3 },
+    subThemes: [
+      {
+        id: "report-design",
+        label: "Report design",
+        codes: [
+          { label: "Shorter form", value: 7 },
+          { label: "Prefill drips", value: 4 },
+          { label: "Quick template", value: 5 },
+        ],
+      },
+      {
+        id: "implementation",
+        label: "Implementation & reminders",
+        codes: [
+          { label: "Mobile access", value: 5 },
+          { label: "Auto-reminder", value: 6 },
+        ],
+      },
     ],
   },
 ];
