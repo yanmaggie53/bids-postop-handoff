@@ -95,16 +95,20 @@ strong {
   color: var(--ink-soft);
 }
 
-.hero__byline {
+.hero__bylines {
   margin-top: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.hero__byline {
+  margin: 0;
+  line-height: 1.2;
   font-family: var(--font-display);
   font-weight: 600;
   letter-spacing: 0.04em;
   color: var(--ink);
-}
-
-.hero__byline + .hero__byline {
-  margin-top: 0.4rem;
 }
 
 .scroll-cue {
