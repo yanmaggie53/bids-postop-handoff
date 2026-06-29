@@ -641,12 +641,16 @@ strong {
 }
 
 /* ---------- WORKFLOW VISUALIZATION (tall, dark, scroll-through) ---------- */
-.workflow {
+.workflow,
+.closing {
   --wf-bg: #10141c;
   --wf-ink: #f3f0e9;
   --wf-ink-soft: #9aa6b6;
   background: var(--wf-bg);
   color: var(--wf-ink);
+}
+
+.workflow {
   padding: 6rem 1.5rem 4rem;
 }
 
@@ -862,6 +866,53 @@ strong {
 .bubble-tooltip.is-visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* ---------- CLOSING (next steps + sources, dark theme to page end) ---------- */
+.workflow.closing {
+  padding: 6rem 1.5rem 5rem;
+}
+
+.closing .workflow__header {
+  margin-bottom: 0;
+}
+
+.closing .prose {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+  color: var(--wf-ink);
+}
+
+.closing .prose p,
+.closing .prose li {
+  color: var(--wf-ink);
+}
+
+/* Lead/subheading matches the workflow section's muted intro color, with
+   extra space before the "Phase 3" kicker. */
+.closing .prose .prose__lead {
+  color: var(--wf-ink-soft);
+  margin-bottom: 3rem;
+}
+
+.closing .prose .prose__kicker {
+  color: #67d4c1;
+}
+
+.closing .prose .prose__list strong {
+  color: var(--wf-ink);
+}
+
+.closing .prose .sources__list {
+  color: var(--wf-ink);
+}
+
+.closing .prose .sources__list em {
+  color: var(--wf-ink);
+}
+
+.closing h2 {
+  color: var(--wf-ink);
 }
 
 /* ---------- SOURCES ---------- */

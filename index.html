@@ -168,11 +168,6 @@
             the workflow, and clinician behavior</li>
           <li><strong>General suggestions</strong> for report improvement and implementation</li>
         </ul>
-        <p class="prose__note">
-          The charts below use placeholder data. Each chart opens on sub-themes;
-          click a bubble to see the codes inside it, then click any code to go back.
-          Bigger bubbles mean more clinicians said the same thing.
-        </p>
       </section>
 
       <!-- 9. BUBBLE CHARTS -->
@@ -180,24 +175,59 @@
         <!-- chart blocks injected by src/sections/bubbles.js -->
       </section>
 
-      <!-- 10. SOURCES -->
-      <section class="prose sources" id="sources">
-        <p class="prose__kicker">Sources cited</p>
-        <ol class="sources__list">
-          <li>
-            Placeholder reference &mdash; Author, A. (Year).
-            <em>Title of the work</em>. Publisher / Journal.
-          </li>
-          <li>
-            Placeholder reference &mdash; Author, B. (Year).
-            <em>Title of the work</em>. Publisher / Journal.
-          </li>
-          <li>
-            Placeholder reference &mdash; Author, C. (Year).
-            <em>Title of the work</em>. Publisher / Journal.
-          </li>
-        </ol>
-      </section>
+      <!-- 10–11. ONGOING WORK, NEXT STEPS & SOURCES (dark theme through page end) -->
+      <div class="workflow closing">
+        <section id="next-steps">
+          <div class="workflow__header">
+            <h2 class="workflow__title">Ongoing Work and Next Steps</h2>
+          </div>
+        </section>
+
+        <section class="prose" id="next-steps-content">
+          <p class="prose__lead">
+            The next step is to evaluate how effectively the new machine learning (ML)
+            risk summary tool integrates into active clinical workflows. Moving forward, I will be
+            helping to conduct the high-fidelity evaluation stage of the INTERACT
+            (IntelligeNt inTERdisciplinAry care ContinuiTy) bundle usability study.
+          </p>
+          <p class="prose__kicker">Phase 3: Usability Study</p>
+          <p>
+            For this next phase, the goal is to evaluate a much more advanced
+            version of the risk summary tool, based on feedback from previous phases.
+            Next steps include:
+          </p>
+          <ul class="prose__list">
+            <li>
+              <strong>Cognitive walkthroughs:</strong>
+              Help conduct walkthroughs with clinicians, and observe and audio-record them as they
+              perform handoff tasks like reviewing reports and documenting care plans.
+            </li>
+            <li>
+              <strong>Thematic analysis:</strong> Analyzing simulation notes and
+              transcripts to code for cognitive/physical workload, workflow barriers, and
+              unintended consequences to refine the tool for future clinical trials.
+            </li>
+          </ul>
+        </section>
+
+        <section class="prose sources" id="sources">
+          <p class="prose__kicker">References</p>
+          <ol class="sources__list">
+            <li>
+              Placeholder reference &mdash; Author, A. (Year).
+              <em>Title of the work</em>. Publisher / Journal.
+            </li>
+            <li>
+              Placeholder reference &mdash; Author, B. (Year).
+              <em>Title of the work</em>. Publisher / Journal.
+            </li>
+            <li>
+              Placeholder reference &mdash; Author, C. (Year).
+              <em>Title of the work</em>. Publisher / Journal.
+            </li>
+          </ol>
+        </section>
+      </div>
     </main>
 
     <script type="module" src="/src/main.js"></script>
