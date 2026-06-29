@@ -812,13 +812,6 @@ strong {
   font-size: var(--text-body);
 }
 
-.bubble-block__hint {
-  margin: 0 auto 1rem;
-  font-size: var(--text-note);
-  color: var(--ink-soft);
-  font-style: italic;
-}
-
 .bubble-block__chart {
   width: 100%;
 }
@@ -846,9 +839,29 @@ strong {
   pointer-events: none;
 }
 
-.bubble__value {
-  font-size: 0.7em;
-  opacity: 0.8;
+.bubble-tooltip {
+  position: fixed;
+  z-index: 50;
+  min-width: 1.75rem;
+  padding: 0.3rem 0.55rem;
+  border-radius: 0.4rem;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.12s ease, transform 0.12s ease;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+.bubble-tooltip.is-visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 /* ---------- SOURCES ---------- */
