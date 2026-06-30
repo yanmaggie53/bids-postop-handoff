@@ -641,16 +641,12 @@ strong {
 }
 
 /* ---------- WORKFLOW VISUALIZATION (tall, dark, scroll-through) ---------- */
-.workflow,
-.closing {
+.workflow {
   --wf-bg: #10141c;
   --wf-ink: #f3f0e9;
   --wf-ink-soft: #9aa6b6;
   background: var(--wf-bg);
   color: var(--wf-ink);
-}
-
-.workflow {
   padding: 6rem 1.5rem 4rem;
 }
 
@@ -868,51 +864,126 @@ strong {
   transform: translateY(0);
 }
 
-/* ---------- CLOSING (next steps + sources, dark theme to page end) ---------- */
-.workflow.closing {
+/* ---------- FINDINGS & ANALYSIS (dark theme: stats + workflow + bubbles) ---------- */
+.findings-dark {
+  --wf-bg: #10141c;
+  --wf-ink: #f3f0e9;
+  --wf-ink-soft: #9aa6b6;
+  background: var(--wf-bg);
+  color: var(--wf-ink);
+}
+
+/* The findings banner blends into the dark section rather than the navy block. */
+.findings-dark .section-divider {
+  background: var(--wf-bg);
+  min-height: 55svh;
+}
+
+.findings-dark .section-divider__title {
+  color: var(--wf-ink);
+}
+
+/* Quick stats on dark. */
+.findings-dark .stats__value {
+  color: var(--wf-ink);
+}
+
+.findings-dark .stats__label {
+  color: var(--wf-ink);
+}
+
+.findings-dark .stats__hint,
+.findings-dark .stats__meta {
+  color: var(--wf-ink-soft);
+}
+
+.findings-dark .stats__toggle {
+  color: #67d4c1;
+}
+
+.findings-dark .stats__toggle:hover,
+.findings-dark .stats__toggle:focus-visible {
+  color: var(--wf-ink);
+}
+
+.findings-dark .stats__breakdown {
+  border-top-color: rgba(255, 255, 255, 0.15);
+}
+
+.findings-dark .stats__breakdown-title {
+  color: var(--wf-ink-soft);
+}
+
+.findings-dark .stats__role-name {
+  color: var(--wf-ink);
+}
+
+.findings-dark .stats__role-bar-track {
+  background: rgba(103, 212, 193, 0.18);
+}
+
+.findings-dark .stats__role-count {
+  color: #67d4c1;
+}
+
+/* Bubble chart titles/blurbs on dark. */
+.findings-dark .bubble-block__title {
+  color: var(--wf-ink);
+}
+
+.findings-dark .bubble-block__blurb {
+  color: var(--wf-ink-soft);
+}
+
+/* ---------- CLOSING (next steps + sources, light theme to page end) ---------- */
+.closing {
+  background: var(--paper);
+  color: var(--ink);
   padding: 6rem 1.5rem 5rem;
 }
 
 .closing .workflow__header {
-  margin-bottom: 0;
+  max-width: 40rem;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.closing .workflow__title,
+.closing h2 {
+  color: var(--navy);
 }
 
 .closing .prose {
   padding-top: 3rem;
   padding-bottom: 3rem;
-  color: var(--wf-ink);
+  color: var(--ink);
 }
 
 .closing .prose p,
 .closing .prose li {
-  color: var(--wf-ink);
+  color: var(--ink);
 }
 
-/* Lead/subheading matches the workflow section's muted intro color, with
-   extra space before the "Phase 3" kicker. */
+/* Lead/subheading is muted, with extra space before the "Phase 3" kicker. */
 .closing .prose .prose__lead {
-  color: var(--wf-ink-soft);
+  color: var(--ink-soft);
   margin-bottom: 3rem;
 }
 
 .closing .prose .prose__kicker {
-  color: #67d4c1;
+  color: var(--accent);
 }
 
 .closing .prose .prose__list strong {
-  color: var(--wf-ink);
+  color: var(--navy);
 }
 
 .closing .prose .sources__list {
-  color: var(--wf-ink);
+  color: var(--ink-soft);
 }
 
 .closing .prose .sources__list em {
-  color: var(--wf-ink);
-}
-
-.closing h2 {
-  color: var(--wf-ink);
+  color: var(--ink);
 }
 
 /* ---------- SOURCES ---------- */

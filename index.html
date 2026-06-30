@@ -60,7 +60,46 @@
         </p>
       </section>
 
-      <!-- 3. DATA COLLECTION METHODOLOGY -->
+      <!-- 3. EPIC HANDOFF TOOL (UI reference + mockups) -->
+      <section class="scroll-section" id="epic-tool">
+        <div class="scroll-section__intro prose">
+          <p class="prose__kicker">The Epic-embedded handoff tool</p>
+          <p>
+            This is the Epic-embedded postoperative handoff report tool, which is
+            on both desktop in Hyperspace and mobile in Haiku. The print-group
+            guides show what sort of information is on the tool. The phone mockup 
+            below shows how the the tool is diplsayed and how it can be scrolled through
+            to view all the information.
+          </p>
+        </div>
+        <div class="tool-ui" id="screenshots-stage">
+          <!-- populated by src/sections/screenshots.js -->
+        </div>
+      </section>
+
+      <!-- 4. EDUCATIONAL EFFORTS (flyers) -->
+      <section class="scroll-section" id="flyers">
+        <div class="scroll-section__intro prose">
+          <p class="prose__kicker">Spreading the word</p>
+          <p>
+            These edcutional flyers were designed to bring awareness to 
+            the Epic handoff tool and its importance in the postoperative 
+            handoff process. They were also to encourage clinicians to use 
+            the tool during the handoff and then provide feedback on how to 
+            improve the design of the tool.
+          </p>
+        </div>
+        <div class="flyers" id="flyers-gallery">
+          <!-- populated by src/sections/flyers.js -->
+        </div>
+      </section>
+
+      <!-- 5. METHODOLOGIES SECTION TITLE -->
+      <section class="section-divider" id="methodologies">
+        <h2 class="section-divider__title">Methodologies</h2>
+      </section>
+
+      <!-- 5a. DATA COLLECTION METHODOLOGY -->
       <section class="prose" id="methods-collection">
         <p class="prose__kicker">Data Collection Methodology</p>
         <p>
@@ -92,70 +131,7 @@
         </p>
       </section>
 
-      <!-- 4. EPIC HANDOFF TOOL (UI reference + mockups) -->
-      <section class="scroll-section" id="epic-tool">
-        <div class="scroll-section__intro prose">
-          <p class="prose__kicker">The Epic-embedded handoff tool</p>
-          <p>
-            This is the Epic-embedded postoperative handoff report tool, which is
-            on both desktop in Hyperspace and mobile in Haiku. The print-group
-            guides show what sort of information is on the tool. The phone mockup 
-            below shows how the the tool is diplsayed and how it can be scrolled through
-            to view all the information.
-          </p>
-        </div>
-        <div class="tool-ui" id="screenshots-stage">
-          <!-- populated by src/sections/screenshots.js -->
-        </div>
-      </section>
-
-      <!-- 5. EDUCATIONAL EFFORTS (flyers) -->
-      <section class="scroll-section" id="flyers">
-        <div class="scroll-section__intro prose">
-          <p class="prose__kicker">Spreading the word</p>
-          <p>
-            These edcutional flyers were designed to bring awareness to 
-            the Epic handoff tool and its importance in the postoperative 
-            handoff process. They were also to encourage clinicians to use 
-            the tool during the handoff and then provide feedback on how to 
-            improve the design of the tool.
-          </p>
-        </div>
-        <div class="flyers" id="flyers-gallery">
-          <!-- populated by src/sections/flyers.js -->
-        </div>
-      </section>
-
-      <!-- 6. WORKFLOW VISUALIZATION (the snake timeline) -->
-      <!-- Tall, scroll-through workflow visualization on a dark backdrop.
-           One continuous winding path of three colored phases. -->
-      <section class="workflow" id="timeline">
-        <div class="workflow__header">
-          <p class="workflow__kicker">The workflow</p>
-          <h2 class="workflow__title">From the OR to the ICU</h2>
-          <p class="workflow__intro">
-            A patient's journey from the OR to the ICU happens in three phases.
-            Scroll to trace the current workflow and click the small
-            <span class="workflow__chev">&#9662;</span> markers along the path to
-            reveal the proposed additions to the current workflow.
-          </p>
-        </div>
-        <div class="workflow__viz" id="timeline-sticky">
-          <!-- SVG injected by src/sections/timeline.js -->
-        </div>
-      </section>
-
-      <!-- 7. FINDINGS SECTION TITLE -->
-      <section class="section-divider" id="findings">
-        <h2 class="section-divider__title">Findings &amp; Analysis</h2>
-      </section>
-
-      <!-- 7b. QUICK STATS -->
-      <section class="stats" id="quick-stats" aria-label="Study quick stats">
-        <!-- populated by src/sections/stats.js -->
-      </section>
-
-      <!-- 8. ANALYSIS METHODOLOGY -->
+      <!-- 5b. ANALYSIS METHODOLOGY -->
       <section class="prose" id="methods-analysis">
         <p class="prose__kicker">Data Analysis Methodology</p>
         <p>
@@ -178,13 +154,45 @@
         </ul>
       </section>
 
-      <!-- 9. BUBBLE CHARTS -->
-      <section class="bubbles-section" id="bubbles">
-        <!-- chart blocks injected by src/sections/bubbles.js -->
-      </section>
+      <!-- 6. FINDINGS & ANALYSIS (dark theme: stats + workflow + bubbles) -->
+      <div class="findings-dark">
+        <!-- 6. FINDINGS SECTION TITLE -->
+        <section class="section-divider" id="findings">
+          <h2 class="section-divider__title">Findings &amp; Analysis</h2>
+        </section>
 
-      <!-- 10–11. ONGOING WORK, NEXT STEPS & SOURCES (dark theme through page end) -->
-      <div class="workflow closing">
+        <!-- 6a. QUICK STATS -->
+        <section class="stats" id="quick-stats" aria-label="Study quick stats">
+          <!-- populated by src/sections/stats.js -->
+        </section>
+
+        <!-- 7. WORKFLOW VISUALIZATION (the snake timeline) -->
+        <!-- Tall, scroll-through workflow visualization on a dark backdrop.
+             One continuous winding path of three colored phases. -->
+        <section class="workflow" id="timeline">
+          <div class="workflow__header">
+            <p class="workflow__kicker">The workflow</p>
+            <h2 class="workflow__title">From the OR to the ICU</h2>
+            <p class="workflow__intro">
+              A patient's journey from the OR to the ICU happens in three phases.
+              Scroll to trace the current workflow and click the small
+              <span class="workflow__chev">&#9662;</span> markers along the path to
+              reveal the proposed additions to the current workflow.
+            </p>
+          </div>
+          <div class="workflow__viz" id="timeline-sticky">
+            <!-- SVG injected by src/sections/timeline.js -->
+          </div>
+        </section>
+
+        <!-- 8. BUBBLE CHARTS -->
+        <section class="bubbles-section" id="bubbles">
+          <!-- chart blocks injected by src/sections/bubbles.js -->
+        </section>
+      </div>
+
+      <!-- 10–11. ONGOING WORK, NEXT STEPS & SOURCES (light theme through page end) -->
+      <div class="closing">
         <section id="next-steps">
           <div class="workflow__header">
             <h2 class="workflow__title">Ongoing Work and Next Steps</h2>
