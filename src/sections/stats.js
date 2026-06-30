@@ -32,7 +32,7 @@ export function initStats() {
     return { item, valueEl };
   }
 
-  grid.appendChild(makeStat(observations, "Total number of handoff observations").item);
+  grid.appendChild(makeStat(observations, "Total handoffs observed").item);
 
   const clinicians = makeStat(cliniciansTotal, "Total number of clinicians talked to");
   const toggleBtn = document.createElement("button");

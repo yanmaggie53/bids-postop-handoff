@@ -167,15 +167,15 @@ export const timelinePhases = [
 
 // Quick stats for the Findings section (replace with real study numbers).
 export const quickStats = {
-  observations: 24,
-  cliniciansTotal: 42,
+  observations: 78,
+  cliniciansTotal: 80,
   cliniciansByRole: {
-    "ICU clinicians": 12,
-    Anesthesiologists: 8,
-    "Certified registered nurse anesthetists": 6,
-    "Student registered nurse anesthetists": 3,
-    "Circulating nurses": 7,
-    Surgeons: 6,
+    "ICU clinicians": 18,
+    Anesthesiologists: 43,
+    CRNAs: 18,
+    SRNAs: 4,
+    "Circulating nurses": 2,
+    Surgeons: 1,
   },
   handoffsWithTool: 14,
 };
