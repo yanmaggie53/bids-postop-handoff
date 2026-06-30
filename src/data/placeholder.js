@@ -177,7 +177,7 @@ export const quickStats = {
     "Circulating nurses": 2,
     Surgeons: 1,
   },
-  handoffsWithTool: 14,
+  handoffsWithTool: 23,
 };
 
 // Bubble chart data — three overarching themes. Each theme has sub-themes;
