@@ -877,6 +877,12 @@ strong {
 .findings-dark .section-divider {
   background: var(--wf-bg);
   min-height: 55svh;
+  padding-bottom: 0;
+}
+
+/* Tighten the gap between the Findings banner and the quick stats. */
+.findings-dark .stats {
+  padding-top: 1rem;
 }
 
 .findings-dark .section-divider__title {
@@ -1063,6 +1069,12 @@ strong {
 
   .stats__role-bar-track {
     width: 100%;
+  }
+
+  .scroll-cue {
+    position: static;
+    transform: none;
+    margin-top: 3rem;
   }
 }
 
