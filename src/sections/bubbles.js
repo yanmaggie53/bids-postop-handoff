@@ -314,6 +314,7 @@ function createBubbleBlock(container, category) {
 
     renderBubbles(svg, category, items, {
       clickable: true,
+      instant: true,
       onSelect: (d) => showCodes(d.id),
     });
   }
