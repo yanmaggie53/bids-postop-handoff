@@ -864,6 +864,79 @@ strong {
   transform: translateY(0);
 }
 
+/* ---------- METHODOLOGIES (navy, gradient into the dark findings section) ---------- */
+.methodology {
+  --meth-bg: var(--navy);
+  --meth-ink: #f3f0e9;
+  --meth-ink-soft: #b7c4d6;
+  background: var(--meth-bg);
+  color: var(--meth-ink);
+}
+
+/* The banner blends into the navy section instead of being a separate block. */
+.methodology .section-divider {
+  background: transparent;
+  min-height: 38svh;
+  padding: 2rem 2rem 1.5rem;
+  align-items: flex-end;
+}
+
+.methodology .section-divider__title {
+  color: var(--meth-ink);
+}
+
+.methodology .prose {
+  padding: 2rem 1.5rem;
+}
+
+/* Title -> Data Collection: a little more than the standard block gap. */
+.methodology #methods-collection {
+  padding-top: 4.5rem;
+  padding-bottom: 0;
+}
+
+/* Data Collection -> Data Analysis: matches the standard block gap. */
+.methodology__fade .prose {
+  padding-top: 5rem;
+  padding-bottom: 3rem;
+}
+
+.methodology .prose p {
+  margin-bottom: 1rem;
+}
+
+.methodology .prose__kicker {
+  margin-bottom: 1rem !important;
+}
+
+.methodology .prose__list {
+  margin-bottom: 1rem;
+}
+
+.methodology .prose,
+.methodology .prose p,
+.methodology .prose li {
+  color: var(--meth-ink);
+}
+
+.methodology .prose__kicker {
+  color: #67d4c1;
+}
+
+.methodology .prose__lead {
+  color: var(--meth-ink);
+}
+
+.methodology .prose__list strong {
+  color: #fff;
+}
+
+/* Full-width fade from navy to the findings dark navy so there is no hard seam. */
+.methodology__fade {
+  width: 100%;
+  background: linear-gradient(180deg, var(--navy) 0%, #10141c 100%);
+}
+
 /* ---------- FINDINGS & ANALYSIS (dark theme: stats + workflow + bubbles) ---------- */
 .findings-dark {
   --wf-bg: #10141c;
