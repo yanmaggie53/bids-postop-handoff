@@ -351,6 +351,7 @@ export function initTimeline() {
       el.label.setAttribute("text-anchor", anchor);
       el.detail.setAttribute("y", 12);
       el.detail.setAttribute("text-anchor", anchor);
+      // Each wrapped line must reset its own x to align with the label.
       el.detailSpans.forEach((tspan) => tspan.setAttribute("x", dx));
     });
 
